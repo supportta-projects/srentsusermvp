@@ -1,36 +1,259 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rentorent - Camera Equipment Rental Marketplace MVP
 
-## Getting Started
+A mobile-first, highly responsive rental marketplace for camera equipment and accessories that connects local rental shops to end users.
 
-First, run the development server:
+## 🎯 Project Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Rentorent enables users to browse visually-rich product cards, filter by category, city, price, and availability, and contact shops directly via a "Contact" CTA on every product card.
+
+## 🚀 Tech Stack
+
+- **Frontend**: Next.js 16 (React) with SSR + static rendering
+- **Styling**: Tailwind CSS v4
+- **Backend**: Firebase (Firestore, Storage, Functions)
+- **Hosting**: Vercel or Firebase Hosting
+- **Analytics**: Google Analytics 4 (GA4)
+
+## 📋 Features
+
+### MVP Features
+- ✅ Responsive homepage with search + city selector
+- ✅ Product listing with cards using dummy camera/accessory data
+- ✅ Working Contact modal that writes leads to Firestore
+- ✅ Product detail page with image carousel and shop info
+- ✅ Filters for city, category, price
+- ✅ Basic analytics events for product view and contact click
+- ✅ Mobile-first responsive design
+- ✅ PWA support with manifest
+- ✅ Skeleton loaders for improved perceived performance
+
+## 🛠️ Setup Instructions
+
+### Prerequisites
+- Node.js 18+ installed
+- Firebase project created
+- Firebase CLI installed (optional, for deployment)
+
+### Installation
+
+1. **Clone and install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Set up environment variables:**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Edit `.env.local` with your Firebase configuration:
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+   NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
+   NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Optional
+   ```
+
+3. **Set up Firestore:**
+   - Create a Firestore database in Firebase Console
+   - Deploy security rules:
+     ```bash
+     firebase deploy --only firestore:rules
+     ```
+   - Deploy indexes:
+     ```bash
+     firebase deploy --only firestore:indexes
+     ```
+
+4. **Seed the database:**
+   ```bash
+   # Install tsx if needed
+   npm install -g tsx
+   
+   # Run seed script
+   npx tsx scripts/seed.ts
+   ```
+   
+   Or create a seed script in `package.json`:
+   ```json
+   "scripts": {
+     "seed": "tsx scripts/seed.ts"
+   }
+   ```
+
+5. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📁 Project Structure
+
+```
+rorusermvp/
+├── src/
+│   ├── app/                    # Next.js app directory
+│   │   ├── layout.tsx          # Root layout with GA
+│   │   ├── page.tsx            # Homepage
+│   │   └── products/
+│   │       └── [id]/
+│   │           └── page.tsx    # Product detail page
+│   ├── components/             # React components
+│   │   ├── Header.tsx          # Header with search & city selector
+│   │   ├── ProductCard.tsx     # Product card component
+│   │   ├── ProductCardSkeleton.tsx  # Loading skeleton
+│   │   ├── ContactModal.tsx    # Contact form modal
+│   │   └── Filters.tsx         # Filter & sort component
+│   ├── lib/                    # Utilities & Firebase
+│   │   ├── firebase.ts         # Firebase initialization
+│   │   ├── firestore.ts        # Firestore helpers
+│   │   └── seed.ts             # Database seed data
+│   └── types/                  # TypeScript types
+│       └── index.ts           # Type definitions
+├── public/                     # Static assets
+│   └── manifest.json          # PWA manifest
+├── scripts/                   # Utility scripts
+│   └── seed.ts               # Seed script runner
+├── firestore.rules           # Firestore security rules
+├── firestore.indexes.json    # Firestore indexes
+└── firebase.json             # Firebase config
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🗄️ Data Model
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Collections
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**shops**
+- `id`: string
+- `name`: string
+- `email`: string
+- `phone`: string
+- `city`: string
+- `address`: string (optional)
+- `rating`: number (optional)
+- `totalRatings`: number (optional)
 
-## Learn More
+**products**
+- `id`: string
+- `shopId`: string
+- `title`: string
+- `description`: string (optional)
+- `category`: 'Cameras' | 'Lenses' | 'Lighting' | 'Accessories'
+- `pricePerDay`: number
+- `city`: string
+- `condition`: 'New' | 'Excellent' | 'Good' | 'Fair'
+- `imageUrls`: string[]
+- `tags`: string[]
+- `available`: boolean
+- `instantAvailability`: boolean (optional)
+- `featured`: boolean (optional)
 
-To learn more about Next.js, take a look at the following resources:
+**contacts**
+- `id`: string
+- `productId`: string
+- `shopId`: string
+- `name`: string
+- `phone`: string
+- `message`: string (optional)
+- `desiredDates`: { start: Date, end: Date } (optional)
+- `status`: 'pending' | 'contacted' | 'booked' | 'cancelled'
+- `createdAt`: Date
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 UI/UX Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Mobile-first design**: Responsive grid (1 col mobile, 2 tablet, 3-4 desktop)
+- **Product cards**: Large images (4:3 aspect), badges, CTAs
+- **Search**: Global search with debounced queries
+- **Filters**: City, category, price range
+- **Sorting**: Relevance, price (low/high), newest
+- **Skeleton loaders**: For improved perceived performance
+- **Contact modal**: Lead capture form with validation
 
-## Deploy on Vercel
+## 📊 Analytics Events
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app tracks the following events (if GA4 is configured):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `product_view`: When a product detail page is viewed
+- `contact_click`: When the Contact button is clicked
+- `contact_submit`: When a contact form is submitted
+
+## 🚢 Deployment
+
+### Deploy to Vercel
+
+1. Push code to GitHub
+2. Import project in Vercel
+3. Add environment variables
+4. Deploy
+
+### Deploy to Firebase Hosting
+
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+## 🔒 Security
+
+- Firestore security rules prevent unauthorized writes
+- Contact form validates phone numbers
+- All user inputs are sanitized
+
+## 📈 Performance Optimizations
+
+- Image lazy loading
+- Skeleton loaders for perceived performance
+- Cursor-based pagination (no offset)
+- Optimized Firestore queries with indexes
+- Static generation where possible
+
+## 🧪 Testing Checklist
+
+- [ ] Mobile responsiveness (iPhone/Android browsers)
+- [ ] Desktop responsiveness
+- [ ] Field validation on contact form
+- [ ] Image lazy-load and low CLS
+- [ ] Firestore security rule tests
+- [ ] Search and filter functionality
+- [ ] Contact form submission
+
+## 🗺️ Roadmap
+
+### Phase 1: MVP (Current)
+- ✅ Basic listing, search, filters
+- ✅ Contact flow
+- ✅ Product detail pages
+
+### Phase 2: Shop Onboarding
+- Shop dashboard
+- Product CRUD
+- Lead management
+
+### Phase 3: Payments & Booking
+- Payment integration
+- Booking confirmation flow
+- Calendar availability
+
+### Phase 4: Advanced Features
+- Geolocation radius search
+- Dynamic availability
+- Advanced search (Algolia integration)
+
+## 📝 Notes
+
+- Images currently use placeholder URLs (Unsplash). Replace with actual product images in production.
+- Firebase Functions for email notifications need to be set up separately.
+- For production, replace placeholder images with actual product photos stored in Firebase Storage.
+
+## 🤝 Contributing
+
+This is an MVP project. Follow the "Act without attachment" principle - build fast, iterate, and deliver value.
+
+## 📄 License
+
+Private project - All rights reserved.
