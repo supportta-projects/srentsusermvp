@@ -86,8 +86,8 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-white mb-4">9. Contact</h2>
             <p>
               For questions about this Privacy Policy, please contact us at{' '}
-              <a href="mailto:support@rentorent.com" className="text-[#DC2626] hover:text-[#B91C1C]">
-                support@rentorent.com
+              <a href="mailto:info@supporttasolutions.com" className="text-[#DC2626] hover:text-[#B91C1C]">
+                info@supporttasolutions.com
               </a>
             </p>
           </section>

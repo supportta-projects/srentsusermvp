@@ -114,7 +114,7 @@ export default function PricingFAQ() {
             Still have questions?
           </p>
           <a
-            href="mailto:support@rentorent.com"
+            href="mailto:info@supporttasolutions.com"
             className="inline-flex items-center gap-2 text-[#DC2626] hover:text-[#B91C1C] font-semibold transition-colors"
           >
             Contact Support

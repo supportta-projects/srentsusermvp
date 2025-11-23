@@ -101,10 +101,10 @@ export default function CompanyInfoSection() {
                 <div>
                   <p className="text-gray-400 text-sm mb-1">Email</p>
                   <a
-                    href="mailto:support@rentorent.com"
+                    href="mailto:info@supporttasolutions.com"
                     className="text-white font-semibold hover:text-[#DC2626] transition-colors"
                   >
-                    support@rentorent.com
+                    info@supporttasolutions.com
                   </a>
                 </div>
               </div>
@@ -115,8 +115,12 @@ export default function CompanyInfoSection() {
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm mb-1">Phone</p>
-                  <p className="text-white font-semibold">+91 XXX XXX XXXX</p>
-                  <p className="text-gray-500 text-xs mt-1">(Available soon)</p>
+                  <a
+                    href="tel:+918590377418"
+                    className="text-white font-semibold hover:text-[#DC2626] transition-colors"
+                  >
+                    +91 8590377418
+                  </a>
                 </div>
               </div>
 

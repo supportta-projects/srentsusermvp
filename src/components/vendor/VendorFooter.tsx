@@ -13,14 +13,14 @@ export default function VendorFooter() {
       { label: 'FAQ', href: '#faq' },
     ],
     support: [
-      { label: 'Contact Support', href: 'mailto:support@rentorent.com' },
+      { label: 'Contact Support', href: 'mailto:info@supporttasolutions.com' },
       { label: 'Documentation', href: '#' },
       { label: 'Help Center', href: '#' },
     ],
     company: [
       { label: 'About Us', href: '#about' },
       { label: 'Security', href: '#security' },
-      { label: 'Contact', href: 'mailto:support@rentorent.com' },
+      { label: 'Contact', href: 'mailto:info@supporttasolutions.com' },
     ],
     legal: [
       { label: 'Terms of Service', href: '/terms' },

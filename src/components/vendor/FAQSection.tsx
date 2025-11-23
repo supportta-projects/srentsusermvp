@@ -61,7 +61,7 @@ const faqs = [
     questions: [
       {
         question: 'How do I get technical support?',
-        answer: 'You can reach our support team via email at support@rentorent.com. We typically respond within 24 hours. Documentation and video tutorials are coming soon.',
+        answer: 'You can reach our support team via email at info@supporttasolutions.com. We typically respond within 24 hours. Documentation and video tutorials are coming soon.',
       },
       {
         question: 'Do you offer training or onboarding?',
@@ -69,7 +69,7 @@ const faqs = [
       },
       {
         question: 'What if I need help migrating my data?',
-        answer: 'Our support team can help you migrate data from other systems. Contact support@rentorent.com with your requirements, and we\'ll assist you with the migration process.',
+        answer: 'Our support team can help you migrate data from other systems. Contact info@supporttasolutions.com with your requirements, and we\'ll assist you with the migration process.',
       },
     ],
   },
@@ -214,7 +214,7 @@ export default function FAQSection() {
             Still have questions?
           </p>
           <a
-            href="mailto:support@rentorent.com"
+            href="mailto:info@supporttasolutions.com"
             className="inline-flex items-center gap-2 text-[#DC2626] hover:text-[#B91C1C] font-semibold transition-colors"
           >
             Contact Support

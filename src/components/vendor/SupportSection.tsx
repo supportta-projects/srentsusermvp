@@ -40,10 +40,10 @@ export default function SupportSection() {
               Get help via email
             </p>
             <a
-              href="mailto:support@rentorent.com"
+              href="mailto:info@supporttasolutions.com"
               className="text-[#DC2626] hover:text-[#B91C1C] text-sm font-semibold transition-colors"
             >
-              support@rentorent.com
+              info@supporttasolutions.com
             </a>
           </motion.div>
 
@@ -120,7 +120,7 @@ export default function SupportSection() {
           className="text-center"
         >
           <motion.a
-            href="mailto:support@rentorent.com"
+            href="mailto:info@supporttasolutions.com"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-2 px-8 py-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-[#DC2626]/50 gpu-accelerated"
