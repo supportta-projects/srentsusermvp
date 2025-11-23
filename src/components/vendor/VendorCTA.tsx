@@ -4,10 +4,27 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
 interface VendorCTAProps {
-  onGetStarted: () => void;
+  onGetStarted?: () => void;
 }
 
 export default function VendorCTA({ onGetStarted }: VendorCTAProps) {
+  const handleGetStarted = () => {
+    if (onGetStarted) {
+      onGetStarted();
+      return;
+    }
+    // Default: scroll to pricing
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      const offset = 80; // Navbar height
+      const elementPosition = pricingSection.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+  };
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black gpu-accelerated">
       <div className="max-w-4xl mx-auto text-center">
@@ -45,7 +62,7 @@ export default function VendorCTA({ onGetStarted }: VendorCTAProps) {
             whileTap={{ scale: 0.95 }}
           >
             <motion.button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="group inline-flex items-center gap-2 px-8 py-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-[#DC2626]/50 gpu-accelerated"
             >
               Get Started

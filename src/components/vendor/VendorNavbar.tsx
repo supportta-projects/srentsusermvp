@@ -10,11 +10,24 @@ export default function VendorNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offset = 80; // Navbar height
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   const navItems = [
-    { label: 'Features', href: '#features' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'Careers', href: '#careers' },
-    { label: 'Contact Us', href: '#contact' },
+    { label: 'Features', href: '#features', onClick: () => scrollToSection('features') },
+    { label: 'Pricing', href: '#pricing', onClick: () => scrollToSection('pricing') },
+    { label: 'How It Works', href: '#how-it-works', onClick: () => scrollToSection('how-it-works') },
+    { label: 'FAQ', href: '#faq', onClick: () => scrollToSection('faq') },
   ];
 
   return (
@@ -39,16 +52,19 @@ export default function VendorNavbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item, index) => (
-              <motion.a
+              <motion.button
                 key={item.href}
-                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (item.onClick) item.onClick();
+                }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
               >
                 {item.label}
-              </motion.a>
+              </motion.button>
             ))}
           </div>
 
@@ -95,14 +111,17 @@ export default function VendorNavbar() {
           >
             <div className="px-4 py-4 space-y-4">
               {navItems.map((item) => (
-                <a
+                <button
                   key={item.href}
-                  href={item.href}
-                  className="block text-sm font-medium text-gray-300 hover:text-white transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMenuOpen(false);
+                    if (item.onClick) item.onClick();
+                  }}
+                  className="block w-full text-left text-sm font-medium text-gray-300 hover:text-white transition-colors"
                 >
                   {item.label}
-                </a>
+                </button>
               ))}
               <div className="pt-4 border-t border-white/10 space-y-2">
                 <button

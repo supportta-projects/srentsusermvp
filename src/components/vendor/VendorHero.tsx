@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import TrustBadges from './TrustBadges';
 
 interface VendorHeroProps {
-  onGetStarted: () => void;
+  onGetStarted?: () => void;
 }
 
 export default function VendorHero({ onGetStarted }: VendorHeroProps) {
@@ -221,7 +221,18 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
               className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4"
             >
               <motion.button
-                onClick={onGetStarted}
+                onClick={() => {
+                  const pricingSection = document.getElementById('pricing');
+                  if (pricingSection) {
+                    const offset = 80; // Navbar height
+                    const elementPosition = pricingSection.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - offset;
+                    window.scrollTo({
+                      top: offsetPosition,
+                      behavior: 'smooth',
+                    });
+                  }
+                }}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-gradient-to-r from-[#DC2626] to-[#EF4444] text-white font-semibold rounded-xl overflow-hidden transition-all duration-300 gpu-accelerated"
@@ -231,7 +242,7 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 <span className="relative text-base sm:text-lg font-semibold tracking-wide">
-                  Get Started for free
+                  Get Started
                 </span>
                 <motion.div
                   className="relative"
@@ -251,7 +262,13 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
                 onClick={() => {
                   const pricingSection = document.getElementById('pricing');
                   if (pricingSection) {
-                    pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const offset = 80; // Navbar height
+                    const elementPosition = pricingSection.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - offset;
+                    window.scrollTo({
+                      top: offsetPosition,
+                      behavior: 'smooth',
+                    });
                   }
                 }}
                 whileHover={{ scale: 1.02, y: -2 }}

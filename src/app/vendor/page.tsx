@@ -43,7 +43,7 @@ export default function VendorLandingPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <VendorNavbar />
-      <VendorHero onGetStarted={() => router.push('/vendor/register')} />
+      <VendorHero />
       <StatsSection />
       <FeaturesSection />
       <ProductDemoSection />
@@ -56,7 +56,7 @@ export default function VendorLandingPage() {
       <SupportSection />
       <FAQSection />
       <CompanyInfoSection />
-      <VendorCTA onGetStarted={() => router.push('/vendor/register')} />
+      <VendorCTA />
       <VendorFooter />
       <WhatsAppButton />
     </div>

@@ -2,17 +2,18 @@
 
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { getSubscriptionPlans } from '@/lib/subscriptions';
 import { SubscriptionPlan } from '@/types';
+import PaymentModal from './PaymentModal';
 
 interface PricingSectionProps {}
 
 export default function PricingSection({}: PricingSectionProps) {
-  const router = useRouter();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     loadPlans();
@@ -348,7 +349,10 @@ export default function PricingSection({}: PricingSectionProps) {
                       </div>
 
                       <motion.button
-                        onClick={() => router.push('/vendor/subscription')}
+                        onClick={() => {
+                          setSelectedPlan(plan);
+                          setIsModalOpen(true);
+                        }}
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                         className={`w-full px-6 py-4 text-white font-semibold rounded-xl transition-all duration-300 gpu-accelerated ${
@@ -392,6 +396,16 @@ export default function PricingSection({}: PricingSectionProps) {
           </div>
         )}
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedPlan(null);
+        }}
+        plan={selectedPlan}
+      />
     </section>
   );
 }
