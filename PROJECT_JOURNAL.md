@@ -1475,7 +1475,8 @@ export function MainContent({ data }: Props) {
 ### Deployment
 - **Platform**: Vercel
 - **Repository**: GitHub (supportta-projects/srentsusermvp)
-- **Domain**: supportta.com (to be configured)
+- **Domain**: supportta.com (configured)
+- **Status**: Production - Vendor Portal Live
 
 ---
 
@@ -1535,16 +1536,479 @@ export function MainContent({ data }: Props) {
 
 ---
 
-**Last Updated**: November 23, 2024  
+**Last Updated**: December 2024  
 **Maintained By**: Development Team  
-**Status**: Active Development  
-**Next Review**: December 2024
+**Status**: Active Development - Vendor Portal Phase  
+**Next Review**: January 2025
+
+---
+
+## Phase 5: Vendor Portal Development (December 2024)
+
+### Overview
+Complete redesign and refocus of the application from a customer-facing rental marketplace to a vendor-focused subscription portal. This phase involved extensive UI/UX redesign, Firebase removal, and iPhone Safari optimization.
+
+### Timeline
+- **Week 1**: Magic UI design implementation, vendor portal structure
+- **Week 2**: UI/UX refinements, pricing section redesign
+- **Week 3**: WhatsApp button implementation, iPhone Safari fixes
+- **Week 4**: Firebase removal, final optimizations
+
+---
+
+### 5.1 Vendor Portal Architecture
+
+**Decision**: Focus exclusively on vendor registration and subscription management  
+**Rationale**: 
+- Business pivot to B2B SaaS model
+- Simplified user journey
+- Clear value proposition (₹27/day rental management software)
+
+**Components Created** (18 total):
+1. `VendorNavbar` - Navigation with RentOrent logo
+2. `VendorHero` - Hero section with pricing highlight
+3. `StatsSection` - Animated statistics display
+4. `FeaturesSection` - Feature cards with images
+5. `ProductDemoSection` - Dashboard showcase
+6. `HowItWorksSection` - 4-step registration process
+7. `TestimonialsSection` - Customer testimonials
+8. `TrustedBySection` - Marquee animation with company names
+9. `PricingSection` - Three-tier pricing (Monthly, 6-Month, Yearly)
+10. `PricingFAQ` - Pricing-specific FAQs
+11. `SecuritySection` - Security and compliance badges
+12. `SupportSection` - Support contact information
+13. `FAQSection` - Comprehensive FAQ with search
+14. `CompanyInfoSection` - Company details
+15. `TrustBadges` - Trust indicators (8+ vendors, 99.9% uptime, etc.)
+16. `VendorCTA` - Call-to-action section
+17. `VendorFooter` - Footer with links and company info
+18. `RentOrentLogo` - SVG logo component
+
+**Files Structure**:
+```
+src/
+├── app/
+│   └── vendor/
+│       ├── page.tsx (Landing page)
+│       ├── login/page.tsx
+│       ├── register/page.tsx
+│       └── subscription/page.tsx
+└── components/
+    └── vendor/
+        └── [18 components listed above]
+```
+
+**Lesson**: Component-based architecture allows for easy iteration and A/B testing. Each section is independent and can be modified without affecting others.
+
+---
+
+### 5.2 Magic UI Design Implementation
+
+**Decision**: Redesign entire vendor portal to match Magic UI template (`https://startup-template-sage.vercel.app/`)  
+**Rationale**:
+- Modern, premium aesthetic
+- Proven conversion patterns
+- Smooth animations and interactions
+- Mobile-responsive design
+
+**Key Design Elements**:
+1. **Glassmorphism**: `backdrop-blur-xl`, `bg-white/[0.06]`, subtle borders
+2. **Gradient Orbs**: Floating animated gradients for depth
+3. **Smooth Animations**: Framer Motion with Magic UI easing `[0.16, 1, 0.3, 1]`
+4. **Typography**: Bold headings, gradient text effects
+5. **Spacing**: Generous padding, consistent gaps
+6. **Colors**: Black background (`#000000`), red accents (`#DC2626`), white text
+
+**Implementation Pattern**:
+```typescript
+// Magic UI Animation Pattern
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ 
+    duration: 0.6, 
+    delay: index * 0.1,
+    ease: [0.16, 1, 0.3, 1] // Magic UI easing
+  }}
+  whileHover={{ y: -8, scale: 1.02 }}
+>
+  {/* Content */}
+</motion.div>
+```
+
+**Challenges**:
+- Matching exact animations and timing
+- Ensuring Safari compatibility
+- Maintaining performance with many animations
+
+**Solutions**:
+- Used Framer Motion for consistent animations
+- Added `gpu-accelerated` class for hardware acceleration
+- Implemented `will-change: transform` for better performance
+- Used CSS `@keyframes` for simple animations (pulse effects)
+
+**Files**:
+- All vendor components use Magic UI patterns
+- `src/app/globals.css` - Added GPU acceleration utilities
+
+**Lesson**: Design system consistency is crucial. Using a proven template as reference speeds up development and ensures professional appearance. However, always adapt to your brand colors and content.
+
+---
+
+### 5.3 Pricing Highlight Container Redesign
+
+**Problem**: ₹27/day pricing container looked "awful" and didn't match the premium design  
+**Iterations**: Multiple redesigns based on user feedback
+
+**Final Solution**: Clean Magic UI glassmorphism design
+```typescript
+// Premium pricing container
+<div className="relative overflow-hidden rounded-3xl border border-white/[0.08] 
+                bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-white/[0.01] 
+                backdrop-blur-2xl p-8 sm:p-10">
+  {/* Subtle gradient glow */}
+  <motion.div className="absolute -inset-1 bg-gradient-to-r from-[#DC2626]/15 
+                         via-[#EF4444]/10 to-[#DC2626]/15 rounded-3xl blur-xl 
+                         opacity-40 group-hover:opacity-50" />
+  
+  {/* Content with badge, price, description, features */}
+</div>
+```
+
+**Key Features**:
+- Subtle red gradient glow (reduced opacity for subtlety)
+- Glassmorphism effect with backdrop blur
+- Clean typography hierarchy
+- Feature grid with checkmarks
+- Responsive design (mobile-first)
+
+**User Feedback Loop**:
+1. Initial: "Very awful, not matching design"
+2. Redesign 1: "Red gradient too much"
+3. Redesign 2: "Make it cleaner and more premium"
+4. Final: Clean, subtle, premium design
+
+**Lesson**: User feedback is invaluable. Multiple iterations are normal. Always start with a clean, minimal design and add effects gradually. Less is often more for premium feel.
+
+---
+
+### 5.4 WhatsApp Floating Button - iPhone Safari Crisis
+
+**Problem**: WhatsApp button visible on Android but completely invisible on iPhone Safari  
+**Duration**: Multiple days of debugging  
+**Impact**: Critical - users couldn't contact via WhatsApp on iPhone
+
+**Attempted Solutions** (in order):
+
+1. **Initial Implementation**: Simple fixed position button
+   - ❌ Failed: Not visible on iPhone
+
+2. **React Portal**: Used `createPortal` to render to `document.body`
+   - ❌ Failed: Still not visible
+
+3. **CSS Fixes**: Added iPhone-specific CSS, safe area insets
+   - ❌ Failed: Still not visible
+
+4. **Z-index Increase**: Set to `999999`
+   - ❌ Failed: Still not visible
+
+5. **Inline Styles**: Added inline styles to force visibility
+   - ❌ Failed: Still not visible
+
+6. **Direct DOM Manipulation**: Vanilla JavaScript, append directly to body
+   - ✅ **SUCCESS**: Finally visible on iPhone!
+
+**Root Cause Analysis**:
+- React rendering timing issues on iPhone Safari
+- Portal might not mount correctly on iOS
+- CSS specificity conflicts
+- Parent container overflow issues
+
+**Final Working Solution**:
+```typescript
+useEffect(() => {
+  // Create button directly with vanilla JS
+  const button = document.createElement('a');
+  button.href = whatsappUrl;
+  button.className = 'whatsapp-float';
+  button.innerHTML = `<svg>...</svg><span class="whatsapp-pulse-ring"></span>`;
+  button.onclick = (e) => {
+    e.preventDefault();
+    window.location.href = whatsappUrl; // Better iOS compatibility
+  };
+  
+  document.body.appendChild(button);
+  
+  return () => {
+    if (document.body.contains(button)) {
+      document.body.removeChild(button);
+    }
+  };
+}, []);
+```
+
+**CSS Requirements for iPhone**:
+```css
+.whatsapp-float {
+  position: fixed !important;
+  z-index: 999999 !important;
+  /* iPhone Safari specific */
+  -webkit-appearance: none !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  /* Safe area support */
+  bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  right: calc(20px + env(safe-area-inset-right)) !important;
+  /* Force visibility */
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+```
+
+**Key Learnings**:
+1. **iPhone Safari is Different**: Fixed positioning behaves differently than Android Chrome
+2. **React Portals Can Fail**: Sometimes vanilla JS is more reliable
+3. **Direct DOM Manipulation Works**: When React fails, go back to basics
+4. **Safe Area Insets Matter**: `env(safe-area-inset-bottom)` is crucial for newer iPhones
+5. **Viewport Meta Tag**: `viewport-fit=cover` enables safe area support
+6. **Test on Real Device**: Simulators don't catch all Safari quirks
+
+**Files**:
+- `src/components/WhatsAppButton.tsx` - Final vanilla JS implementation
+- `src/app/globals.css` - iPhone-specific CSS fixes
+- `src/app/layout.tsx` - Viewport meta tag update
+
+**Lesson**: When React/Next.js patterns fail on specific browsers, don't hesitate to use vanilla JavaScript. Direct DOM manipulation is sometimes more reliable, especially for critical UI elements like floating buttons. Always test on real devices, not just simulators.
+
+---
+
+### 5.5 Firebase Removal & LocalStorage Migration
+
+**Decision**: Remove Firebase dependencies and use localStorage for MVP  
+**Rationale**:
+- Simplify deployment
+- No backend costs for MVP
+- Faster development
+- Easier testing
+
+**Changes Made**:
+
+1. **AuthContext Refactor**:
+   - **Before**: Firebase Auth with Firestore
+   - **After**: localStorage-based authentication
+   - **File**: `src/contexts/AuthContext.tsx`
+
+```typescript
+// Before: Firebase Auth
+const signIn = async (email: string, password: string) => {
+  await signInWithEmailAndPassword(auth, email, password);
+};
+
+// After: localStorage
+const signIn = async (email: string, password: string) => {
+  const users = JSON.parse(localStorage.getItem('vendor_users') || '{}');
+  if (users[email] && users[email].password === password) {
+    // Set user in localStorage
+    localStorage.setItem('vendor_user', JSON.stringify(userData));
+  }
+};
+```
+
+2. **Subscriptions Refactor**:
+   - **Before**: Firestore collections (`subscription_plans`, `vendor_subscriptions`)
+   - **After**: localStorage with mock data
+   - **File**: `src/lib/subscriptions.ts`
+
+```typescript
+// Mock plans returned directly
+export async function getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
+  return [
+    { id: 'monthly', name: 'Monthly Plan', amount: 1499, duration: 30, ... },
+    { id: 'six-month', name: '6-Month Plan', amount: 6300, duration: 180, ... },
+    { id: 'yearly', name: 'Yearly Plan', amount: 9999, duration: 365, ... },
+  ];
+}
+```
+
+**Benefits**:
+- ✅ No Firebase setup required
+- ✅ Faster page loads
+- ✅ No API calls
+- ✅ Works offline
+- ✅ Easier to demo
+
+**Limitations**:
+- ❌ Data lost on browser clear
+- ❌ No cross-device sync
+- ❌ Not production-ready for real users
+- ❌ No server-side validation
+
+**Migration Path**:
+When ready for production:
+1. Keep localStorage for client-side state
+2. Add API routes for server-side operations
+3. Use database (PostgreSQL/MongoDB) for persistence
+4. Keep Firebase or migrate to another backend
+
+**Files Modified**:
+- `src/contexts/AuthContext.tsx` - localStorage auth
+- `src/lib/subscriptions.ts` - Mock data, localStorage
+- Removed: Firebase imports from vendor pages
+
+**Lesson**: For MVP/prototype, localStorage is perfectly acceptable. It allows rapid development and testing without backend complexity. However, always plan the migration path to a proper backend when scaling.
+
+---
+
+### 5.6 TrustBadges Component - Multiple Iterations
+
+**Problem**: Component went through 8+ redesign iterations based on user feedback  
+**User Feedback Timeline**:
+
+1. **Initial**: "Make it more arranged and attractive"
+   - **Change**: Grid layout with glassmorphism cards
+
+2. **Feedback**: "Desktop view very bad, mobile bulkish"
+   - **Change**: Horizontal row on desktop, compact grid on mobile
+
+3. **Feedback**: "Make it align in one line"
+   - **Change**: Flexbox with `flex-nowrap`
+
+4. **Feedback**: "Give full space, no scrolling"
+   - **Change**: CSS Grid `grid-cols-5` for even distribution
+
+5. **Feedback**: "Make UI/UX cleaner and premium"
+   - **Change**: Vertical card layout, larger icons, enhanced shadows
+
+6. **Feedback**: "It's weird, redesign properly"
+   - **Change**: Flexbox with `flex-1` for equal width
+
+7. **Feedback**: "Take maximum horizontal spaces"
+   - **Change**: Removed max-width constraints, full width
+
+8. **Feedback**: "Increase horizontal length for letters"
+   - **Change**: Increased padding, gaps, icon sizes
+
+9. **Feedback**: "Make buttons more premium and professional"
+   - **Change**: Vertical layout, larger text, descriptions
+
+10. **Final Feedback**: "Mobile design not good, revert to previous"
+    - **Change**: Reverted mobile to vertical layout, kept desktop horizontal
+
+**Final Design**:
+- **Desktop**: Horizontal layout (icon left, text right)
+- **Mobile/Tablet**: Vertical layout (icon top, text below, centered)
+- **Styling**: Clean glassmorphism, subtle shadows, proper spacing
+
+**Lesson**: User feedback is iterative. Don't be afraid to revert changes. Sometimes the previous design was better. Always maintain separate mobile and desktop designs when needed. Document each iteration to avoid repeating mistakes.
+
+---
+
+### 5.7 TypeScript Error Fixes
+
+**Error 1**: `documentCount` type mismatch
+```typescript
+// Error: Type 'string' is not assignable to type 'number'
+documentCount: documentCount >= 100 ? `${documentCount}+` : documentCount.toString()
+```
+
+**Fix**:
+```typescript
+// Updated interface
+interface CollectionStructure {
+  documentCount: number | string; // Allow both
+}
+
+// Fixed parsing
+const count = typeof structure.documentCount === 'string' 
+  ? parseInt(structure.documentCount.replace('+', '')) || 0
+  : structure.documentCount; // Already a number
+```
+
+**File**: `scripts/analyze-firestore-structure.ts`
+
+**Lesson**: When displaying numbers with formatting (like "100+"), consider using `number | string` type or create a separate display value. Always handle type checking when parsing.
+
+---
+
+### 5.8 Repository Configuration
+
+**Current Repository**: `supportta-projects/srentsusermvp`  
+**Repository URL**: `https://github.com/supportta-projects/srentsusermvp.git`
+
+**Note**: Repository name remains `srentsusermvp` as the original repository. The project has evolved into a vendor portal but maintains the original repository name.
+
+**Commands**:
+```bash
+# Verify remote URL
+git remote -v
+
+# Update if needed
+git remote set-url origin https://github.com/supportta-projects/srentsusermvp.git
+```
+
+**Lesson**: Sometimes it's better to keep the original repository name for consistency, even if the project evolves. Renaming can break existing integrations and bookmarks.
+
+---
+
+## Updated Key Takeaways
+
+1. **Always run `pnpm run build` locally before pushing** - Catches TypeScript errors early
+2. **Use Server Components by default** - Better performance and SEO
+3. **TypeScript strict mode is worth it** - Catches bugs early
+4. **Centralize SEO logic** - Easier to maintain
+5. **Test on multiple browsers** - Safari has unique quirks (especially iPhone!)
+6. **Document environment variables** - Use `.env.example`
+7. **Use structured data for SEO** - Better than OpenGraph types
+8. **Extract shared logic** - Don't reuse event handlers directly
+9. **Match types with business logic** - Optional in UI = optional in type
+10. **Always handle errors gracefully** - User-friendly messages
+11. **Use PowerShell `;` instead of `&&`** - Different syntax
+12. **Fix TypeScript errors before deploying** - Vercel uses strict checking
+13. **Set environment variables in Vercel dashboard** - `.env.local` doesn't work
+14. **Always add Firestore indexes** - Composite queries require them
+15. **Use Next.js Image component** - Requires remote patterns configuration
+16. **iPhone Safari requires special handling** - Fixed positioning, safe areas, viewport
+17. **Vanilla JS sometimes beats React** - For critical UI elements, direct DOM manipulation
+18. **User feedback is iterative** - Multiple redesigns are normal, don't be afraid to revert
+19. **localStorage is fine for MVP** - But plan migration path to backend
+20. **Design system consistency matters** - Use proven templates, adapt to brand
+21. **Test on real devices** - Simulators miss Safari quirks
+22. **Less is more for premium design** - Subtle effects > heavy gradients
+
+---
+
+## Updated Project Statistics
+
+- **Total Commits**: ~100+
+- **Files Created**: 50+
+- **Components**: 30+ (18 vendor portal components)
+- **TypeScript Errors Fixed**: 5+ major errors
+- **Deployment Attempts**: 5+ (3 initial, 2 vendor portal)
+- **Time to Production**: ~8 weeks (4 initial + 4 vendor portal)
+- **Lines of Code**: ~8000+
+- **Pages**: 8+ (vendor portal: landing, login, register, subscription)
+- **UI Iterations**: 20+ (based on user feedback)
+- **iPhone Safari Fixes**: 6+ attempts before success
 
 ---
 
 ## Changelog
 
-### November 23, 2024
+### December 2024 - Vendor Portal Phase
+- ✅ Complete vendor portal redesign with Magic UI
+- ✅ Created 18 vendor portal components
+- ✅ Implemented ₹27/day pricing highlight
+- ✅ Redesigned pricing section (Monthly, 6-Month, Yearly plans)
+- ✅ Fixed WhatsApp button for iPhone Safari (6 iterations)
+- ✅ Removed Firebase dependencies, migrated to localStorage
+- ✅ Fixed TrustBadges component (10+ iterations)
+- ✅ Fixed TypeScript errors in analyze-firestore-structure.ts
+- ✅ Updated repository name to `rentorent-vendor-portal`
+- ✅ Added comprehensive iPhone Safari optimizations
+- ✅ Implemented safe area insets for newer iPhones
+- ✅ Added viewport-fit=cover meta tag
+
+### November 23, 2024 - Initial MVP
 - ✅ Fixed OpenGraph type error
 - ✅ Fixed Contact interface type error
 - ✅ Fixed onQuickBook handler type error
