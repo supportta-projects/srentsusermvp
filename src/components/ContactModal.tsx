@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { Product } from '@/types';
-import { createContact } from '@/lib/firestore';
+import { createContact, getShop } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
+import Button from './ui/Button';
+import QuickActions from './ui/QuickActions';
+import Price from './ui/Price';
 
 interface ContactModalProps {
   product: Product;
@@ -11,15 +15,32 @@ interface ContactModalProps {
 }
 
 export default function ContactModal({ product, isOpen, onClose }: ContactModalProps) {
+  const { customer } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     message: '',
-    startDate: '',
-    endDate: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [shop, setShop] = useState<any>(null);
+
+  useEffect(() => {
+    if (isOpen && product.shopId) {
+      getShop(product.shopId).then(setShop);
+    }
+  }, [isOpen, product.shopId]);
+
+  // Pre-fill form with authenticated user data
+  useEffect(() => {
+    if (isOpen && customer) {
+      setFormData(prev => ({
+        name: prev.name || customer.name || '',
+        phone: prev.phone || customer.phone || '',
+        message: prev.message || '',
+      }));
+    }
+  }, [isOpen, customer]);
 
   if (!isOpen) return null;
 
@@ -38,13 +59,9 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
       await createContact({
         productId: product.id,
         shopId: product.shopId,
-        name: formData.name,
+        name: formData.name || undefined,
         phone: cleanedPhone,
         message: formData.message || undefined,
-        desiredDates: formData.startDate && formData.endDate ? {
-          start: new Date(formData.startDate),
-          end: new Date(formData.endDate),
-        } : undefined,
         status: 'pending',
       });
 
@@ -62,8 +79,6 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
         name: '',
         phone: '',
         message: '',
-        startDate: '',
-        endDate: '',
       });
 
       setTimeout(() => {
@@ -80,8 +95,8 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-[#1a1a1a] rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-white/10">
-        <div className="sticky top-0 bg-[#1a1a1a] border-b border-white/10 px-6 py-5 flex items-center justify-between">
+      <div className="bg-[#0F0F0F] rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-white/10">
+        <div className="sticky top-0 bg-[#0F0F0F] border-b border-white/10 px-6 py-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white">Contact Shop</h2>
           <button
             onClick={onClose}
@@ -93,31 +108,38 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
         </div>
 
         <div className="px-6 py-4 bg-black/30 border-b border-white/10">
-          <h3 className="font-semibold text-white mb-1">{product.title}</h3>
-          <p className="text-sm text-gray-400 font-medium">
-            ₹{product.pricePerDay.toLocaleString()} / day • {product.city}
-          </p>
+          <h3 className="font-semibold text-white mb-2 text-lg">{product.title}</h3>
+          <div className="flex items-center gap-4 text-sm text-gray-400">
+            <Price amount={product.pricePerDay} period="/day" size="sm" />
+            <span>•</span>
+            <span>{product.city}</span>
+          </div>
         </div>
+
+        {/* Quick Actions */}
+        {shop && shop.phone && (
+          <div className="px-6 py-4 border-b border-white/10">
+            <QuickActions
+              phone={shop.phone}
+              productTitle={product.title}
+              onQuickBook={handleSubmit}
+            />
+          </div>
+        )}
+
+        {/* Show customer info if authenticated */}
+        {customer && (
+          <div className="px-6 py-3 bg-[#DC2626]/10 border-b border-white/10">
+            <p className="text-xs text-gray-400 mb-1">Signed in as</p>
+            <p className="text-sm text-white font-medium">{customer.name}</p>
+            <p className="text-xs text-gray-400">{customer.email}</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1.5">
-              Your Name <span className="text-gray-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="name"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 text-sm text-white placeholder-gray-500 backdrop-blur-xl transition-all"
-              placeholder="Enter your name"
-            />
-          </div>
-
-          <div>
             <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-1.5">
-              Phone Number <span className="text-gray-500">*</span>
+              Phone Number <span className="text-red-400">*</span>
             </label>
             <input
               type="tel"
@@ -125,7 +147,7 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
               required
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 text-sm text-white placeholder-gray-500 backdrop-blur-xl transition-all"
+              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626]/50 focus:border-[#DC2626]/30 text-base text-white placeholder-gray-500 backdrop-blur-xl transition-all min-h-[48px]"
               placeholder="10-digit mobile number"
               maxLength={10}
             />
@@ -133,50 +155,35 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
           </div>
 
           <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1.5">
+              Your Name <span className="text-gray-500">(Optional)</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626]/50 focus:border-[#DC2626]/30 text-base text-white placeholder-gray-500 backdrop-blur-xl transition-all min-h-[48px]"
+              placeholder="Enter your name"
+            />
+          </div>
+
+          <div>
             <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1.5">
-              Message (Optional)
+              Message <span className="text-gray-500">(Optional)</span>
             </label>
             <textarea
               id="message"
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 text-sm text-white placeholder-gray-500 resize-none backdrop-blur-xl transition-all"
+              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626]/50 focus:border-[#DC2626]/30 text-base text-white placeholder-gray-500 resize-none backdrop-blur-xl transition-all"
               placeholder="Any specific requirements?"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-300 mb-1.5">
-                Start Date
-              </label>
-              <input
-                type="date"
-                id="startDate"
-                value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                min={new Date().toISOString().split('T')[0]}
-                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 text-sm text-white backdrop-blur-xl"
-              />
-            </div>
-            <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-300 mb-1.5">
-                End Date
-              </label>
-              <input
-                type="date"
-                id="endDate"
-                value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                min={formData.startDate || new Date().toISOString().split('T')[0]}
-                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 text-sm text-white backdrop-blur-xl"
-              />
-            </div>
-          </div>
-
           {submitStatus === 'success' && (
-            <div className="bg-[#10b981]/20 border border-[#10b981]/50 text-[#10b981] px-4 py-3 rounded-lg text-sm animate-scale-in">
+            <div className="bg-[#10B981]/20 border border-[#10B981]/50 text-[#10B981] px-4 py-3 rounded-lg text-sm animate-scale-in">
               ✓ Contact request submitted! The shop will reach out to you soon.
             </div>
           )}
@@ -187,20 +194,24 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
           )}
 
           <div className="flex space-x-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="md"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-white/10 text-gray-300 rounded-lg hover:bg-white/5 font-medium transition-colors"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="primary"
+              size="md"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2.5 bg-[#10b981] hover:bg-[#059669] text-white rounded-lg font-semibold disabled:opacity-50 transition-all"
+              className="flex-1"
             >
               {isSubmitting ? 'Submitting...' : 'Send Request'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

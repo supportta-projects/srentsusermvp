@@ -38,7 +38,11 @@ Rentorent enables users to browse visually-rich product cards, filter by categor
 
 1. **Clone and install dependencies:**
    ```bash
-   npm install
+   # Install pnpm if you haven't already
+   npm install -g pnpm
+   
+   # Install project dependencies
+   pnpm install
    ```
 
 2. **Set up environment variables:**
@@ -55,6 +59,7 @@ Rentorent enables users to browse visually-rich product cards, filter by categor
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
    NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
    NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Optional
+   NEXT_PUBLIC_SITE_URL=https://rentorent.net  # Required for SEO (canonical URLs, sitemap, Open Graph)
    ```
 
 3. **Set up Firestore:**
@@ -70,23 +75,13 @@ Rentorent enables users to browse visually-rich product cards, filter by categor
 
 4. **Seed the database:**
    ```bash
-   # Install tsx if needed
-   npm install -g tsx
-   
-   # Run seed script
-   npx tsx scripts/seed.ts
-   ```
-   
-   Or create a seed script in `package.json`:
-   ```json
-   "scripts": {
-     "seed": "tsx scripts/seed.ts"
-   }
+   # Run seed script (tsx is already in devDependencies)
+   pnpm run seed
    ```
 
 5. **Run the development server:**
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
 6. **Open your browser:**
@@ -194,7 +189,7 @@ The app tracks the following events (if GA4 is configured):
 ### Deploy to Firebase Hosting
 
 ```bash
-npm run build
+pnpm run build
 firebase deploy --only hosting
 ```
 

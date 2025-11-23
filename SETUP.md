@@ -3,7 +3,11 @@
 ## 1. Install Dependencies
 
 ```bash
-npm install
+# Install pnpm if you haven't already
+npm install -g pnpm
+
+# Install project dependencies
+pnpm install
 ```
 
 ## 2. Configure Firebase
@@ -26,7 +30,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
 
 ```bash
 # Install Firebase CLI if needed
-npm install -g firebase-tools
+pnpm install -g firebase-tools
 
 # Login to Firebase
 firebase login
@@ -41,7 +45,7 @@ firebase deploy --only firestore:rules,firestore:indexes
 ## 4. Seed Database
 
 ```bash
-npm run seed
+pnpm run seed
 ```
 
 This will create:
@@ -51,7 +55,7 @@ This will create:
 ## 5. Run Development Server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Open http://localhost:3000

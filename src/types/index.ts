@@ -5,6 +5,7 @@ export interface Shop {
   phone: string;
   city: string;
   address?: string;
+  imageUrl?: string;
   rating?: number;
   totalRatings?: number;
   createdAt: Date;
@@ -57,3 +58,15 @@ export type FilterOptions = {
 };
 
 export type SortOption = 'relevance' | 'price-low' | 'price-high' | 'newest';
+
+export interface Customer {
+  id: string; // Firebase Auth UID
+  email: string;
+  name: string;
+  phone?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  favoriteShops?: string[];
+  favoriteProducts?: string[];
+  createdBy?: 'vendor' | 'self'; // Track account origin
+}

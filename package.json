@@ -10,6 +10,7 @@
     "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
+    "firebase": "^11.0.2",
     "next": "16.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0"

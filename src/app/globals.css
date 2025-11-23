@@ -1,17 +1,54 @@
 @import "tailwindcss";
 
 :root {
+  /* Primary Colors (60%) - Black & White */
   --background: #000000;
+  --surface: #0F0F0F;
+  --surface-elevated: #1A1A1A;
+  --border: rgba(255, 255, 255, 0.1);
   --foreground: #ffffff;
-  --surface: #1a1a1a;
-  --surface-elevated: #242424;
-  --border: #333333;
-  --accent-green: #10b981;
-  --accent-green-dark: #059669;
-  --accent-green-light: #34d399;
   --text-primary: #ffffff;
-  --text-secondary: #a1a1a6;
-  --text-tertiary: #6e6e73;
+  --text-secondary: #B3B3B3;
+  --text-tertiary: #808080;
+  
+  /* Secondary Color (30%) - Red for Prices/CTAs Only */
+  --accent-red: #DC2626;
+  --accent-red-dark: #B91C1C;
+  --accent-red-light: #EF4444;
+  
+  /* Accent Color (10%) - Green for Availability/Success Only */
+  --accent-green: #10B981;
+  --accent-green-dark: #059669;
+  --accent-green-light: #34D399;
+  
+  /* Typography Scale */
+  --font-size-hero-price-mobile: 48px;
+  --font-size-hero-price-desktop: 64px;
+  --font-size-title-mobile: 18px;
+  --font-size-title-desktop: 24px;
+  --font-size-body-mobile: 14px;
+  --font-size-body-desktop: 16px;
+  --font-size-small: 12px;
+  --line-height-body: 1.5;
+  --line-height-heading: 1.2;
+  
+  /* Spacing System */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  
+  /* Component Sizes */
+  --touch-target-min: 44px;
+  --cta-height-mobile: 48px;
+  --cta-height-desktop: 52px;
+  --card-padding-mobile: 20px;
+  --card-padding-desktop: 24px;
+  --card-gap-mobile: 16px;
+  --card-gap-desktop: 24px;
 }
 
 @theme inline {
@@ -90,21 +127,21 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #10b981, #059669);
+  background: linear-gradient(180deg, #DC2626, #B91C1C);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #34d399, #10b981);
+  background: linear-gradient(180deg, #EF4444, #DC2626);
 }
 
 /* Premium Gradients */
-.gradient-green {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+.gradient-red {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
 }
 
-.gradient-green-text {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+.gradient-red-text {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

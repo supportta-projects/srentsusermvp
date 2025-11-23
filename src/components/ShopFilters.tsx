@@ -37,14 +37,14 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
       <div className="md:hidden fixed bottom-20 right-4 z-40">
         <button
           onClick={() => setIsOpen(true)}
-          className="gradient-green text-white px-5 py-4 rounded-full shadow-lg shadow-[#10b981]/30 hover:shadow-[#10b981]/50 transition-all duration-300 flex items-center gap-2 font-semibold hover:scale-105"
+          className="gradient-red text-white px-5 py-4 rounded-full shadow-lg shadow-[#DC2626]/30 hover:shadow-[#DC2626]/50 transition-all duration-300 flex items-center gap-2 font-semibold hover:scale-105"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
           Filters
           {hasActiveFilters && (
-            <span className="bg-white text-[#10b981] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="bg-white text-[#DC2626] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               !
             </span>
           )}
@@ -68,24 +68,24 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
             <div className="p-5 space-y-6">
               {/* Search */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-3">Search Products</label>
+                <label className="block text-base font-medium text-gray-300 mb-3">Search Products</label>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
                   placeholder="Search by name, brand..."
-                  className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white placeholder-gray-500 backdrop-blur-xl min-h-[48px]"
                 />
               </div>
 
               {/* Category */}
               {categories.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-3">Category</label>
+                  <label className="block text-base font-medium text-gray-300 mb-3">Category</label>
                   <select
                     value={filters.category || ''}
                     onChange={(e) => onFiltersChange({ ...filters, category: e.target.value || undefined })}
-                    className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white backdrop-blur-xl"
+                    className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white backdrop-blur-xl min-h-[48px]"
                   >
                     <option value="">All Categories</option>
                     {categories.map((cat) => (
@@ -99,44 +99,44 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
 
               {/* Brand */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-3">Brand (Optional)</label>
+                <label className="block text-base font-medium text-gray-300 mb-3">Brand (Optional)</label>
                 <input
                   type="text"
                   value={filters.brand || ''}
                   onChange={(e) => onFiltersChange({ ...filters, brand: e.target.value || undefined })}
                   placeholder="Enter brand name..."
-                  className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white placeholder-gray-500 backdrop-blur-xl min-h-[48px]"
                 />
               </div>
 
               {/* Price Range */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-3">Price Range (₹/day)</label>
+                <label className="block text-base font-medium text-gray-300 mb-3">Price Range (₹/day)</label>
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="number"
                     value={filters.minPrice || ''}
                     onChange={(e) => onFiltersChange({ ...filters, minPrice: e.target.value ? Number(e.target.value) : undefined })}
                     placeholder="Min"
-                    className="px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                    className="px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white placeholder-gray-500 backdrop-blur-xl min-h-[48px]"
                   />
                   <input
                     type="number"
                     value={filters.maxPrice || ''}
                     onChange={(e) => onFiltersChange({ ...filters, maxPrice: e.target.value ? Number(e.target.value) : undefined })}
                     placeholder="Max"
-                    className="px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                    className="px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white placeholder-gray-500 backdrop-blur-xl min-h-[48px]"
                   />
                 </div>
               </div>
 
               {/* Sort */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-3">Sort By</label>
+                <label className="block text-base font-medium text-gray-300 mb-3">Sort By</label>
                 <select
                   value={sortBy}
                   onChange={(e) => onSortChange(e.target.value as SortOption)}
-                  className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white backdrop-blur-xl"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white backdrop-blur-xl min-h-[48px]"
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -160,7 +160,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="flex-1 px-4 py-3 gradient-green text-white rounded-lg hover:shadow-lg hover:shadow-[#10b981]/30 font-semibold transition-all"
+                  className="flex-1 px-4 py-3 gradient-red text-white rounded-lg hover:shadow-lg hover:shadow-[#DC2626]/30 font-semibold transition-all"
                 >
                   Apply
                 </button>
@@ -181,7 +181,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search products..."
-                className="w-full px-4 py-2 pl-10 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                className="w-full px-4 py-3 pl-10 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white placeholder-gray-500 backdrop-blur-xl min-h-[44px]"
               />
               <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -193,7 +193,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
               <select
                 value={filters.category || ''}
                 onChange={(e) => onFiltersChange({ ...filters, category: e.target.value || undefined })}
-                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white backdrop-blur-xl"
+                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-base text-white backdrop-blur-xl min-h-[44px]"
               >
                 <option value="">All Categories</option>
                 {categories.map((cat) => (
@@ -210,7 +210,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
               value={filters.brand || ''}
               onChange={(e) => onFiltersChange({ ...filters, brand: e.target.value || undefined })}
               placeholder="Brand..."
-              className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl w-32"
+              className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-sm text-white placeholder-gray-500 backdrop-blur-xl w-32"
             />
 
             {/* Price Range */}
@@ -220,7 +220,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
                 value={filters.minPrice || ''}
                 onChange={(e) => onFiltersChange({ ...filters, minPrice: e.target.value ? Number(e.target.value) : undefined })}
                 placeholder="Min"
-                className="w-24 px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                className="w-24 px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
               />
               <span className="text-gray-600">-</span>
               <input
@@ -228,7 +228,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
                 value={filters.maxPrice || ''}
                 onChange={(e) => onFiltersChange({ ...filters, maxPrice: e.target.value ? Number(e.target.value) : undefined })}
                 placeholder="Max"
-                className="w-24 px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                className="w-24 px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-sm text-white placeholder-gray-500 backdrop-blur-xl"
               />
             </div>
 
@@ -236,7 +236,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
             <select
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value as SortOption)}
-              className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] text-sm text-white backdrop-blur-xl"
+              className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] text-sm text-white backdrop-blur-xl"
             >
               {SORT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -248,7 +248,7 @@ export default function ShopFilters({ filters, sortBy, searchQuery, onFiltersCha
             {hasActiveFilters && (
               <button
                 onClick={onReset}
-                className="px-4 py-2 text-sm text-[#10b981] hover:text-[#34d399] font-medium transition-colors"
+                className="px-4 py-2 text-sm text-[#DC2626] hover:text-[#EF4444] font-medium transition-colors"
               >
                 Clear All
               </button>

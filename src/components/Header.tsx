@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import RORLogo from './RORLogo';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthModal from './AuthModal';
 
 const CITIES = ['All Cities', 'Bengaluru', 'Mumbai', 'Delhi', 'Chennai'];
 
@@ -15,6 +18,11 @@ export default function Header({ onSearch, onCityChange, selectedCity = 'All Cit
   const [searchQuery, setSearchQuery] = useState('');
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
   const [citySearchQuery, setCitySearchQuery] = useState('');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  
+  const { user, customer, signOut } = useAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,107 +44,21 @@ export default function Header({ onSearch, onCityChange, selectedCity = 'All Cit
     <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-2xl border-b border-white/5 relative">
       {/* Floating Gradient Background Animations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-[10%] w-64 h-64 bg-gradient-to-br from-[#10b981]/20 to-[#059669]/10 rounded-full blur-3xl floating-gradient-1"></div>
-        <div className="absolute top-0 right-[15%] w-80 h-80 bg-gradient-to-bl from-[#34d399]/15 to-[#10b981]/20 rounded-full blur-3xl floating-gradient-2"></div>
-        <div className="absolute bottom-0 left-[20%] w-72 h-72 bg-gradient-to-tr from-[#059669]/15 to-[#34d399]/10 rounded-full blur-3xl floating-gradient-3"></div>
-        <div className="absolute top-1/2 right-[5%] w-60 h-60 bg-gradient-to-r from-[#10b981]/18 to-[#059669]/12 rounded-full blur-3xl floating-gradient-4"></div>
+        <div className="absolute top-0 left-[10%] w-64 h-64 bg-gradient-to-br from-[#DC2626]/20 to-[#B91C1C]/10 rounded-full blur-3xl floating-gradient-1"></div>
+        <div className="absolute top-0 right-[15%] w-80 h-80 bg-gradient-to-bl from-[#EF4444]/15 to-[#DC2626]/20 rounded-full blur-3xl floating-gradient-2"></div>
+        <div className="absolute bottom-0 left-[20%] w-72 h-72 bg-gradient-to-tr from-[#B91C1C]/15 to-[#EF4444]/10 rounded-full blur-3xl floating-gradient-3"></div>
+        <div className="absolute top-1/2 right-[5%] w-60 h-60 bg-gradient-to-r from-[#DC2626]/18 to-[#B91C1C]/12 rounded-full blur-3xl floating-gradient-4"></div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="relative w-9 h-9 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 backdrop-blur-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20">
-              {/* Realistic Sappotta Fruit Logo */}
-              <svg 
-                viewBox="0 0 40 40" 
-                className="w-7 h-7"
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Stem */}
-                <rect 
-                  x="18" 
-                  y="2" 
-                  width="2" 
-                  height="4" 
-                  fill="#8b6f47"
-                  stroke="#6b5235"
-                  strokeWidth="0.5"
-                />
-                
-                {/* Left Leaf - Natural Shape */}
-                <path 
-                  d="M14 4 Q12 6 13 9 Q14 12 16 10 Q15 8 15 6 Q14.5 5 14 4 Z" 
-                  fill="#10b981"
-                  stroke="#059669"
-                  strokeWidth="0.3"
-                />
-                {/* Left Leaf Vein */}
-                <path 
-                  d="M14 4 Q14.5 6 15 8" 
-                  stroke="#059669"
-                  strokeWidth="0.4"
-                  fill="none"
-                />
-                
-                {/* Right Leaf - Natural Shape */}
-                <path 
-                  d="M26 4 Q28 6 27 9 Q26 12 24 10 Q25 8 25 6 Q25.5 5 26 4 Z" 
-                  fill="#10b981"
-                  stroke="#059669"
-                  strokeWidth="0.3"
-                />
-                {/* Right Leaf Vein */}
-                <path 
-                  d="M26 4 Q25.5 6 25 8" 
-                  stroke="#059669"
-                  strokeWidth="0.4"
-                  fill="none"
-                />
-                
-                {/* Fruit Body - Realistic Oval Shape */}
-                <ellipse 
-                  cx="20" 
-                  cy="24" 
-                  rx="7" 
-                  ry="9" 
-                  fill="#c49a6c"
-                  stroke="#8b6f47"
-                  strokeWidth="0.5"
-                />
-                
-                {/* Fruit Texture/Shading */}
-                <ellipse 
-                  cx="18" 
-                  cy="22" 
-                  rx="4" 
-                  ry="6" 
-                  fill="#d4a574"
-                  opacity="0.6"
-                />
-                <ellipse 
-                  cx="22" 
-                  cy="26" 
-                  rx="3" 
-                  ry="5" 
-                  fill="#a67c52"
-                  opacity="0.4"
-                />
-                
-                {/* Natural Highlight */}
-                <ellipse 
-                  cx="17" 
-                  cy="21" 
-                  rx="2" 
-                  ry="3" 
-                  fill="#e8c9a0"
-                  opacity="0.5"
-                />
-              </svg>
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <RORLogo size={32} className="text-[#DC2626]" />
             </div>
-            <span className="text-xl md:text-2xl font-semibold text-white tracking-tight">
-              srents
+            <span className="text-xl md:text-2xl font-bold text-white tracking-tight">
+              rentorent
             </span>
           </Link>
 
@@ -192,7 +114,7 @@ export default function Header({ onSearch, onCityChange, selectedCity = 'All Cit
                         onChange={(e) => setCitySearchQuery(e.target.value)}
                         placeholder="Search city..."
                         onClick={(e) => e.stopPropagation()}
-                        className="w-full px-3 py-2 pl-9 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981]/30 text-sm text-white placeholder-gray-500 backdrop-blur-xl"
+                        className="w-full px-3 py-2 pl-9 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626]/50 focus:border-[#DC2626]/30 text-sm text-white placeholder-gray-500 backdrop-blur-xl"
                       />
                       <svg className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -227,6 +149,68 @@ export default function Header({ onSearch, onCityChange, selectedCity = 'All Cit
               </>
             )}
           </div>
+
+          {/* Auth Section */}
+          <div className="flex items-center gap-3 ml-4">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#DC2626] flex items-center justify-center text-white font-semibold">
+                    {customer?.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="hidden sm:inline">{customer?.name || user.email}</span>
+                </button>
+                
+                {isUserMenuOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-[49]" 
+                      onClick={() => setIsUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-xl shadow-2xl border border-white/10 z-[100] overflow-hidden">
+                      <div className="px-4 py-3 border-b border-white/5">
+                        <p className="text-sm text-white font-medium">{customer?.name || 'User'}</p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          await signOut();
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setAuthMode('login');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => {
+                    setAuthMode('signup');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-all duration-300"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Mobile Search */}
@@ -241,13 +225,19 @@ export default function Header({ onSearch, onCityChange, selectedCity = 'All Cit
             />
             <button
               type="submit"
-              className="px-4 py-2.5 bg-[#10b981] hover:bg-[#059669] text-white rounded-full transition-all duration-300 text-sm font-medium"
+              className="px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-full transition-all duration-300 text-sm font-medium"
             >
               Search
             </button>
           </form>
         </div>
       </div>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
+      />
     </header>
   );
 }
