@@ -24,6 +24,25 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
 NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
+
+# Razorpay Configuration (for vendor subscriptions)
+# Option 1: Use Test/Dummy Credentials (for development)
+RAZORPAY_KEY_ID=rzp_test_dummy123
+RAZORPAY_KEY_SECRET=dummy_secret_123
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_dummy123
+RAZORPAY_WEBHOOK_SECRET=dummy_webhook_secret
+
+# Option 2: Use Real Razorpay Test Credentials (get from Razorpay dashboard)
+# RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxx
+# RAZORPAY_KEY_SECRET=your_test_secret_key
+# NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxx
+# RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+
+# Option 3: Use Live Credentials (for production)
+# RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxx
+# RAZORPAY_KEY_SECRET=your_live_secret_key
+# NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxx
+# RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 ```
 
 ## 3. Deploy Firestore Rules & Indexes

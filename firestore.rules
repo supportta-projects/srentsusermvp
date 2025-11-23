@@ -6,10 +6,87 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Helper function to check if user is the customer
-    function isCustomer(customerId) {
-      return isAuthenticated() && request.auth.uid == customerId;
+    // Helper function to get user role (returns null if staff doc doesn't exist)
+    function getUserRole() {
+      let staffDocPath = /databases/$(database)/documents/rental_staff/$(request.auth.uid);
+      return exists(staffDocPath) ? get(staffDocPath).data.role : null;
     }
+    
+    // Helper function to check if user is super admin
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserRole() == 'superAdmin';
+    }
+    
+    // Rental Shops - Super admin can read all, others can only read their own shop
+    // Allow authenticated users to create shops (needed during shop creation when shop admin is authenticated)
+    // Only super admin can update/delete shops
+    match /rental_shops/{shopId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && isSuperAdmin();
+    }
+    
+    // Rental Staff - Users can read their own shop's staff, super admin can read all
+    match /rental_staff/{staffId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && 
+        (isSuperAdmin() || getUserRole() == 'admin');
+    }
+    
+    // Rental Products - Users can read/write their own shop's products
+    match /rental_products/{productId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Rental Customers - Users can read/write their own shop's customers
+    match /rental_customers/{customerId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Global Customers - All authenticated users can read (app filters by isApproved)
+    // Only super admin can approve/reject, but any user can create (when creating regular customer)
+    match /global_customers/{customerId} {
+      // Allow all authenticated users to read (queries filter by isApproved in app code)
+      allow read: if isAuthenticated();
+      // Anyone authenticated can create (when creating a regular customer)
+      allow create: if isAuthenticated();
+      // Only super admin can update (approve/reject)
+      allow update: if isAuthenticated() && isSuperAdmin();
+      // Only super admin can delete (reject)
+      allow delete: if isAuthenticated() && isSuperAdmin();
+    }
+    
+    // Rental Orders - Users can read/write their own shop's orders
+    match /rental_orders/{orderId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Rental Categories - Users can read/write their own shop's categories
+    match /rental_categories/{categoryId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Rental Brands - Users can read/write their own shop's brands
+    match /rental_brands/{brandId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Company Settings - Super admin can read/write all
+    match /company_settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isSuperAdmin();
+    }
+    
+    // ============================================
+    // MARKETPLACE COLLECTIONS (This Project)
+    // ============================================
     
     // Products collection - read-only for all, write for admins
     match /products/{productId} {
@@ -25,11 +102,11 @@ service cloud.firestore {
     
     // Customers collection - users can read/write their own data
     match /customers/{customerId} {
-      allow read: if isCustomer(customerId);
+      allow read: if isAuthenticated() && request.auth.uid == customerId;
       allow create: if isAuthenticated() 
                    && request.auth.uid == customerId
                    && request.resource.data.keys().hasAll(['email', 'name', 'createdAt', 'updatedAt']);
-      allow update: if isCustomer(customerId);
+      allow update: if isAuthenticated() && request.auth.uid == customerId;
       allow delete: if false; // Prevent deletion, use soft delete if needed
     }
     
@@ -41,6 +118,41 @@ service cloud.firestore {
       allow read: if false; // Only shop owners/admins via Firebase Functions
       allow update, delete: if false; // Only admins via Firebase Functions
     }
+    
+    // ============================================
+    // SUBSCRIPTION COLLECTIONS (New - Safe Addition)
+    // ============================================
+    
+    // Subscription Plans - All authenticated users can read, super admin can write
+    match /subscription_plans/{planId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isSuperAdmin();
+    }
+    
+    // Vendor Subscriptions - Vendors can read/write their own, super admin can read/write all
+    match /vendor_subscriptions/{vendorId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == vendorId || 
+        isSuperAdmin()
+      );
+      allow create: if isAuthenticated() && request.auth.uid == vendorId;
+      allow update: if isAuthenticated() && (
+        request.auth.uid == vendorId || 
+        isSuperAdmin()
+      );
+    }
+    
+    // Subscription Payments - Vendors can read their own, super admin can read/update all
+    match /subscription_payments/{paymentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.vendorId == request.auth.uid || 
+        isSuperAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.vendorId == request.auth.uid ||
+        isSuperAdmin()
+      );
+    }
   }
 }
-

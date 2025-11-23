@@ -5,6 +5,7 @@ import Script from "next/script";
 import { generateMetadata as generateSEOMetadata, getSiteUrl, getCanonicalUrl } from "@/lib/seo";
 import { StructuredData, generateWebSiteStructuredData } from "@/components/StructuredData";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,12 +60,14 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#DC2626" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
       >
         <AuthProvider>
+          {/* Scroll to top on route change */}
+          <ScrollToTop />
           {/* WebSite Structured Data */}
           <StructuredData data={generateWebSiteStructuredData()} />
           

@@ -1,20 +1,17 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { 
-  User, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  updateProfile
-} from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
 import { Customer } from '@/types';
 
+// Mock User type (matching Firebase User interface)
+interface MockUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: MockUser | null;
   customer: Customer | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
@@ -25,94 +22,111 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<MockUser | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      
-      if (firebaseUser) {
-        // Fetch customer data from Firestore
-        try {
-          const customerDoc = await getDoc(doc(db, 'customers', firebaseUser.uid));
-          if (customerDoc.exists()) {
-            const data = customerDoc.data();
-            setCustomer({
-              id: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              name: data.name || firebaseUser.displayName || '',
-              phone: data.phone,
-              createdAt: data.createdAt?.toDate() || new Date(),
-              updatedAt: data.updatedAt?.toDate() || new Date(),
-              favoriteShops: data.favoriteShops || [],
-              favoriteProducts: data.favoriteProducts || [],
-              createdBy: data.createdBy,
-            });
-          } else {
-            // Create customer document if it doesn't exist (for vendor-created accounts)
-            const customerData = {
-              email: firebaseUser.email,
-              name: firebaseUser.displayName || '',
-              createdAt: serverTimestamp(),
-              updatedAt: serverTimestamp(),
-              favoriteShops: [],
-              favoriteProducts: [],
-              createdBy: 'vendor', // Assume vendor-created if doc doesn't exist
-            };
-            await setDoc(doc(db, 'customers', firebaseUser.uid), customerData);
-            setCustomer({
-              id: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              name: firebaseUser.displayName || '',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              favoriteShops: [],
-              favoriteProducts: [],
-              createdBy: 'vendor',
-            });
-          }
-        } catch (error) {
-          console.error('Error fetching customer data:', error);
-        }
-      } else {
-        setCustomer(null);
+    // Load user from localStorage on mount
+    const storedUser = localStorage.getItem('vendor_user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        setCustomer({
+          id: userData.uid,
+          email: userData.email || '',
+          name: userData.displayName || '',
+          phone: userData.phone,
+          createdAt: new Date(userData.createdAt || Date.now()),
+          updatedAt: new Date(userData.updatedAt || Date.now()),
+          favoriteShops: [],
+          favoriteProducts: [],
+          createdBy: 'self',
+        });
+      } catch (error) {
+        console.error('Error loading user from localStorage:', error);
+        localStorage.removeItem('vendor_user');
       }
-      
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    }
+    setLoading(false);
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    // Mock authentication - check localStorage
+    const storedUsers = localStorage.getItem('vendor_users') || '{}';
+    const users = JSON.parse(storedUsers);
+    
+    if (users[email] && users[email].password === password) {
+      const userData = {
+        uid: users[email].uid,
+        email: email,
+        displayName: users[email].name,
+      };
+      
+      setUser(userData);
+      localStorage.setItem('vendor_user', JSON.stringify(userData));
+      
+      setCustomer({
+        id: userData.uid,
+        email: email,
+        name: users[email].name,
+        phone: users[email].phone,
+        createdAt: new Date(users[email].createdAt),
+        updatedAt: new Date(),
+        favoriteShops: [],
+        favoriteProducts: [],
+        createdBy: 'self',
+      });
+    } else {
+      throw new Error('Invalid email or password');
+    }
   };
 
   const signUp = async (email: string, password: string, name: string, phone?: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // Mock registration - store in localStorage
+    const storedUsers = localStorage.getItem('vendor_users') || '{}';
+    const users = JSON.parse(storedUsers);
     
-    // Update Firebase Auth profile
-    await updateProfile(userCredential.user, { displayName: name });
+    if (users[email]) {
+      throw new Error('Email already registered');
+    }
     
-    // Create customer document in Firestore
-    const customerData = {
-      email,
+    const uid = `vendor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const userData = {
+      uid,
+      email: email,
+      displayName: name,
+    };
+    
+    users[email] = {
+      uid,
       name,
       phone: phone || null,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      password, // In production, this should be hashed
+      createdAt: Date.now(),
+    };
+    
+    localStorage.setItem('vendor_users', JSON.stringify(users));
+    localStorage.setItem('vendor_user', JSON.stringify(userData));
+    
+    setUser(userData);
+    setCustomer({
+      id: uid,
+      email: email,
+      name: name,
+      phone: phone,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       favoriteShops: [],
       favoriteProducts: [],
       createdBy: 'self',
-    };
-    
-    await setDoc(doc(db, 'customers', userCredential.user.uid), customerData);
+    });
   };
 
   const signOut = async () => {
-    await firebaseSignOut(auth);
+    localStorage.removeItem('vendor_user');
+    setUser(null);
     setCustomer(null);
   };
 

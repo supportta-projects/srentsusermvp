@@ -1,0 +1,101 @@
+{
+  "projectId": "unknown",
+  "analyzedAt": "2025-11-23T18:48:35.105Z",
+  "collections": [
+    {
+      "name": "rental_shops",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "rental_products",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "rental_orders",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "rental_customers",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "rental_staff",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "rental_brands",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "rental_categories",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "global_customers",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "company_settings",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "vendors",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "vendor_subscriptions",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "shops",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "products",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "customers",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    },
+    {
+      "name": "contacts",
+      "documentCount": 0,
+      "fields": [],
+      "hasData": false
+    }
+  ],
+  "summary": {
+    "totalCollections": 15,
+    "collectionsWithData": 0,
+    "totalDocuments": 0
+  }
+}

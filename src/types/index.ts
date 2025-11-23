@@ -70,3 +70,72 @@ export interface Customer {
   favoriteProducts?: string[];
   createdBy?: 'vendor' | 'self'; // Track account origin
 }
+
+// Subscription Types
+export interface SubscriptionPlan {
+  id: string; // 'monthly', 'quarterly', 'yearly'
+  name: string;
+  description: string;
+  amount: number; // in rupees
+  duration: number; // in days
+  features: string[];
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface VendorSubscription {
+  id: string; // Document ID = vendorId (Firebase Auth UID)
+  vendorId: string; // Firebase Auth UID (same as document ID)
+  shopId?: string; // Optional: link to rental_shops if needed
+  
+  // Subscription Details
+  planId: string; // 'monthly', 'quarterly', 'yearly'
+  planName: string;
+  amount: number;
+  duration: number; // in days
+  
+  // Status
+  status: 'active' | 'expired' | 'cancelled' | 'none';
+  
+  // Dates
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Razorpay
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySubscriptionId?: string;
+  
+  // Auto-renewal
+  autoRenew: boolean;
+  
+  // Notes
+  notes?: string;
+}
+
+export interface SubscriptionPayment {
+  id: string; // Auto-generated
+  vendorId: string; // Firebase Auth UID
+  subscriptionId: string; // Links to vendor_subscriptions document ID
+  
+  // Payment Details
+  amount: number;
+  planId: string;
+  planName: string;
+  
+  // Razorpay
+  razorpayOrderId: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  
+  // Status
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  
+  // Timestamps
+  createdAt: Date;
+  completedAt?: Date;
+  failedAt?: Date;
+}
