@@ -44,8 +44,7 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const submitContact = async () => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
@@ -93,6 +92,15 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
     }
   };
 
+  const handleQuickBook = () => {
+    submitContact();
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    await submitContact();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="bg-[#0F0F0F] rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-white/10">
@@ -122,7 +130,7 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
             <QuickActions
               phone={shop.phone}
               productTitle={product.title}
-              onQuickBook={handleSubmit}
+              onQuickBook={handleQuickBook}
             />
           </div>
         )}
