@@ -36,7 +36,7 @@ export interface Contact {
   id: string;
   productId: string;
   shopId: string;
-  name: string;
+  name?: string;
   phone: string;
   message?: string;
   desiredDates?: {
