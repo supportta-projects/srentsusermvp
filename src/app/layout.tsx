@@ -6,6 +6,7 @@ import { generateMetadata as generateSEOMetadata, getSiteUrl, getCanonicalUrl } 
 import { StructuredData, generateWebSiteStructuredData } from "@/components/StructuredData";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollToTop from "@/components/ScrollToTop";
+import FloatingWhatsapp from "@/components/WhatsAppButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -90,6 +91,10 @@ export default function RootLayout({
           )}
           {children}
         </AuthProvider>
+        
+        {/* Floating layer – independent of page content */}
+        {/* Direct child of <body>, outside all containers including AuthProvider */}
+        <FloatingWhatsapp />
       </body>
     </html>
   );

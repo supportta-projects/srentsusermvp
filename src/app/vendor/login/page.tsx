@@ -124,12 +124,12 @@ export default function VendorLoginPage() {
             className="mt-6 text-center"
           >
             <p className="text-gray-400 text-sm">
-              Don't have an account?{' '}
+              Need to subscribe?{' '}
               <a
-                href="/vendor/register"
+                href="/vendor#pricing"
                 className="text-[#DC2626] hover:text-[#B91C1C] font-medium"
               >
-                Register here
+                View pricing plans
               </a>
             </p>
           </motion.div>

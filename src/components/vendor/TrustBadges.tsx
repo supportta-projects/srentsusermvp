@@ -1,9 +1,10 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Shield, CreditCard, Clock, CheckCircle } from 'lucide-react';
 
-export default function TrustBadges() {
+function TrustBadges() {
   const badges = [
     {
       icon: Users,
@@ -217,4 +218,6 @@ export default function TrustBadges() {
     </motion.div>
   );
 }
+
+export default memo(TrustBadges);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { Package, ShoppingCart, Users, UserCog, BarChart3, Smartphone } from 'lucide-react';
 import Image from 'next/image';
 
@@ -62,42 +62,50 @@ const features = [
 ];
 
 export default function FeaturesSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+    );
+
+    const cards = sectionRef.current?.querySelectorAll('.feature-card');
+    cards?.forEach((card) => observer.observe(card));
+
+    return () => {
+      cards?.forEach((card) => observer.unobserve(card));
+    };
+  }, []);
+
   return (
-    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-black">
+    <section ref={sectionRef} id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-black">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16 animate-slide-up">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
             Everything You Need to Manage Your Rental Business
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Powerful features designed specifically for rental shops. All included in every plan.
           </p>
-        </motion.div>
+        </div>
 
         {/* Features Grid - Responsive */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: index * 0.1,
-                  ease: [0.16, 1, 0.3, 1]
-                }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group bg-[#1A1A1A] border border-white/10 rounded-2xl overflow-hidden hover:border-[#DC2626]/50 transition-all duration-300 gpu-accelerated"
+                className="feature-card animate-on-scroll group bg-[#1A1A1A] border border-white/10 rounded-2xl overflow-hidden hover:border-[#DC2626]/50 transition-all duration-300 gpu-accelerated hover:-translate-y-2 hover:scale-[1.02]"
+                style={{ transitionDelay: `${index * 50}ms` }}
               >
                 {/* Image - PNG for mobile only, SVG/others for desktop - Full visibility on mobile */}
                 <div className="relative min-h-[240px] h-[240px] sm:h-[260px] md:h-56 lg:h-64 overflow-hidden bg-[#0F0F0F]">
@@ -134,23 +142,17 @@ export default function FeaturesSection() {
                   </div>
                   <p className="text-sm sm:text-base text-gray-400 leading-relaxed">{feature.description}</p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* Feature Comparison Note */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-16 text-center"
-        >
+        <div className="mt-16 text-center animate-slide-up" style={{ animationDelay: '0.6s' }}>
           <p className="text-gray-400 text-sm">
             All features are included in every plan. No hidden costs, no feature restrictions.
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

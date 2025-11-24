@@ -14,84 +14,37 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
       {/* Background Gradient - Safari optimized */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#DC2626]/10 via-transparent to-transparent gpu-accelerated" />
       
-      {/* Floating gradient orbs - Magic UI style */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-[#DC2626]/20 to-[#B91C1C]/10 rounded-full blur-3xl"
-          animate={{
-            x: [0, 30, 0],
-            y: [0, -30, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-[#EF4444]/15 to-[#DC2626]/20 rounded-full blur-3xl"
-          animate={{
-            x: [0, -40, 0],
-            y: [0, 40, 0],
-            scale: [1, 0.9, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+      {/* Floating gradient orbs - CSS optimized (disabled on mobile) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden md:block">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-[#DC2626]/20 to-[#B91C1C]/10 rounded-full blur-3xl animate-float-orb" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-[#EF4444]/15 to-[#DC2626]/20 rounded-full blur-3xl animate-float-orb" style={{ animationDelay: '10s' }} />
       </div>
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.8,
-              ease: [0.16, 1, 0.3, 1] // Magic UI easing
-            }}
-            className="space-y-8 gpu-accelerated"
-          >
+          <div className="space-y-8 gpu-accelerated animate-slide-up">
             {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300"
-            >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <span className="text-[#DC2626]">✨</span>
               <span>Complete Rental Management Software</span>
-            </motion.div>
+            </div>
 
             {/* Main Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight"
-            >
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <span className="text-white">Manage Your Rental Business</span>
               <br />
               <span className="bg-gradient-to-r from-[#DC2626] to-[#EF4444] bg-clip-text text-transparent">
                 Like a Pro
               </span>
-            </motion.h1>
+            </h1>
 
             {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-xl"
-            >
+            <p className="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-xl animate-slide-up" style={{ animationDelay: '0.4s' }}>
               Complete inventory, order, and customer management software built specifically for rental shops. 
               <br className="hidden sm:block" />
               Track everything in one place and grow your business effortlessly.
-            </motion.p>
+            </p>
 
             {/* Price Highlight - Magic UI Premium Design */}
             <motion.div
@@ -107,7 +60,7 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
               />
               
               {/* Main container - Magic UI glassmorphism */}
-              <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-white/[0.01] backdrop-blur-2xl p-8 sm:p-10"
+              <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-white/[0.01] backdrop-blur-sm md:backdrop-blur-2xl p-8 sm:p-10"
                 style={{
                   boxShadow: `
                     0 0 0 1px rgba(255, 255, 255, 0.05) inset,
@@ -287,29 +240,22 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
 
             {/* Trust Badges */}
             <TrustBadges />
-          </motion.div>
+          </div>
 
           {/* Right Hero Image - Business Dashboard */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ 
-              duration: 0.8, 
-              delay: 0.6,
-              ease: [0.16, 1, 0.3, 1]
-            }}
-            className="relative gpu-accelerated"
-          >
+          <div className="relative gpu-accelerated animate-slide-up" style={{ animationDelay: '0.6s' }}>
             <div className="relative aspect-square max-w-lg mx-auto">
               {/* Rental Dashboard SVG */}
               <img
                 src="/svg/rentalDashboard.svg"
                 alt="Rental Business Dashboard"
                 className="w-full h-full object-contain rounded-3xl border border-white/10 shadow-2xl"
+                loading="eager"
+                fetchPriority="high"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-3xl" />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

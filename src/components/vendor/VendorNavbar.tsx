@@ -31,7 +31,7 @@ export default function VendorNavbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 gpu-accelerated">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 md:bg-black/80 backdrop-blur-sm md:backdrop-blur-md border-b border-white/10 gpu-accelerated">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -75,18 +75,9 @@ export default function VendorNavbar() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
               onClick={() => router.push('/vendor/login')}
-              className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-            >
-              Log in
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              onClick={() => router.push('/vendor/register')}
               className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
             >
-              Sign up
+              Log in
             </motion.button>
           </div>
 
@@ -107,7 +98,7 @@ export default function VendorNavbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-black/95 backdrop-blur-md border-t border-white/10"
+            className="md:hidden bg-black/95 backdrop-blur-sm border-t border-white/10"
           >
             <div className="px-4 py-4 space-y-4">
               {navItems.map((item) => (
@@ -123,24 +114,15 @@ export default function VendorNavbar() {
                   {item.label}
                 </button>
               ))}
-              <div className="pt-4 border-t border-white/10 space-y-2">
+              <div className="pt-4 border-t border-white/10">
                 <button
                   onClick={() => {
                     router.push('/vendor/login');
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left text-sm font-medium text-gray-300 hover:text-white transition-colors"
-                >
-                  Log in
-                </button>
-                <button
-                  onClick={() => {
-                    router.push('/vendor/register');
-                    setIsMenuOpen(false);
-                  }}
                   className="block w-full px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
                 >
-                  Sign up
+                  Log in
                 </button>
               </div>
             </div>

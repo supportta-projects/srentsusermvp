@@ -116,16 +116,27 @@ export default function HowItWorksSection() {
           className="mt-12 text-center"
         >
           <p className="text-gray-400 mb-4">
-            Ready to get started? It only takes a few minutes.
+            Ready to get started? Choose a plan and subscribe.
           </p>
-          <motion.a
-            href="/vendor/register"
+          <motion.button
+            onClick={() => {
+              const pricingSection = document.getElementById('pricing');
+              if (pricingSection) {
+                const offset = 80;
+                const elementPosition = pricingSection.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth',
+                });
+              }
+            }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-2 px-8 py-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-[#DC2626]/50 gpu-accelerated"
           >
-            Start Your Free Trial
-          </motion.a>
+            View Pricing Plans
+          </motion.button>
         </motion.div>
       </div>
     </section>

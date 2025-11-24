@@ -2,18 +2,17 @@
 
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { getSubscriptionPlans } from '@/lib/subscriptions';
 import { SubscriptionPlan } from '@/types';
-import PaymentModal from './PaymentModal';
 
 interface PricingSectionProps {}
 
 export default function PricingSection({}: PricingSectionProps) {
+  const router = useRouter();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     loadPlans();
@@ -133,7 +132,7 @@ export default function PricingSection({}: PricingSectionProps) {
             />
             
             {/* Main container - Magic UI glassmorphism */}
-            <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-white/[0.01] backdrop-blur-2xl px-8 py-6 sm:px-10 sm:py-8"
+            <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-white/[0.01] backdrop-blur-sm md:backdrop-blur-xl px-8 py-6 sm:px-10 sm:py-8"
               style={{
                 boxShadow: `
                   0 0 0 1px rgba(255, 255, 255, 0.05) inset,
@@ -350,8 +349,8 @@ export default function PricingSection({}: PricingSectionProps) {
 
                       <motion.button
                         onClick={() => {
-                          setSelectedPlan(plan);
-                          setIsModalOpen(true);
+                          // Redirect to profile page
+                          router.push(`/vendor/subscribe/profile?plan=${plan.id}`);
                         }}
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.98 }}
@@ -396,16 +395,6 @@ export default function PricingSection({}: PricingSectionProps) {
           </div>
         )}
       </div>
-
-      {/* Payment Modal */}
-      <PaymentModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedPlan(null);
-        }}
-        plan={selectedPlan}
-      />
     </section>
   );
 }

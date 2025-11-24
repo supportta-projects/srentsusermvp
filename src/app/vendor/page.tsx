@@ -2,23 +2,58 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import VendorHero from '@/components/vendor/VendorHero';
+import VendorNavbar from '@/components/vendor/VendorNavbar';
 import StatsSection from '@/components/vendor/StatsSection';
-import FeaturesSection from '@/components/vendor/FeaturesSection';
-import ProductDemoSection from '@/components/vendor/ProductDemoSection';
-import HowItWorksSection from '@/components/vendor/HowItWorksSection';
-import TestimonialsSection from '@/components/vendor/TestimonialsSection';
 import TrustedBySection from '@/components/vendor/TrustedBySection';
 import PricingSection from '@/components/vendor/PricingSection';
-import PricingFAQ from '@/components/vendor/PricingFAQ';
-import SecuritySection from '@/components/vendor/SecuritySection';
-import SupportSection from '@/components/vendor/SupportSection';
-import FAQSection from '@/components/vendor/FAQSection';
-import CompanyInfoSection from '@/components/vendor/CompanyInfoSection';
-import VendorCTA from '@/components/vendor/VendorCTA';
-import VendorFooter from '@/components/vendor/VendorFooter';
-import VendorNavbar from '@/components/vendor/VendorNavbar';
-import WhatsAppButton from '@/components/WhatsAppButton';
+// WhatsAppButton is rendered in root layout as direct child of <body>
+
+// Lazy load below-the-fold components for better initial load performance
+const FeaturesSection = dynamic(() => import('@/components/vendor/FeaturesSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const ProductDemoSection = dynamic(() => import('@/components/vendor/ProductDemoSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const HowItWorksSection = dynamic(() => import('@/components/vendor/HowItWorksSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const TestimonialsSection = dynamic(() => import('@/components/vendor/TestimonialsSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const PricingFAQ = dynamic(() => import('@/components/vendor/PricingFAQ'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const SecuritySection = dynamic(() => import('@/components/vendor/SecuritySection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const SupportSection = dynamic(() => import('@/components/vendor/SupportSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const FAQSection = dynamic(() => import('@/components/vendor/FAQSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const CompanyInfoSection = dynamic(() => import('@/components/vendor/CompanyInfoSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const VendorCTA = dynamic(() => import('@/components/vendor/VendorCTA'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
+const VendorFooter = dynamic(() => import('@/components/vendor/VendorFooter'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
 
 export default function VendorLandingPage() {
   const router = useRouter();
@@ -58,7 +93,7 @@ export default function VendorLandingPage() {
       <CompanyInfoSection />
       <VendorCTA />
       <VendorFooter />
-      <WhatsAppButton />
+      {/* WhatsAppButton is added directly to body via JavaScript - not rendered here */}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle2 } from 'lucide-react';
 import { SubscriptionPlan } from '@/types';
@@ -12,6 +13,10 @@ interface PaymentModalProps {
 }
 
 export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState('100vh');
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -21,6 +26,110 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+
+  // Ensure component is mounted (for portal)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Calculate actual viewport height for Safari
+  useEffect(() => {
+    const updateViewportHeight = () => {
+      // Use window.innerHeight for Safari (accounts for address bar)
+      const vh = window.innerHeight;
+      setViewportHeight(`${vh}px`);
+      
+      // Ensure modal container is at top
+      if (containerRef.current) {
+        containerRef.current.scrollTop = 0;
+      }
+    };
+
+    if (isOpen) {
+      updateViewportHeight();
+      
+      // Update frequently for Safari (address bar changes)
+      const interval = setInterval(updateViewportHeight, 100);
+      
+      window.addEventListener('resize', updateViewportHeight);
+      window.addEventListener('orientationchange', updateViewportHeight);
+      
+      // Handle keyboard appearance
+      const handleFocusIn = (e: FocusEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          // Scroll input into view when keyboard appears
+          setTimeout(() => {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300);
+        }
+      };
+      
+      document.addEventListener('focusin', handleFocusIn);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('resize', updateViewportHeight);
+        window.removeEventListener('orientationchange', updateViewportHeight);
+        document.removeEventListener('focusin', handleFocusIn);
+      };
+    }
+  }, [isOpen]);
+
+  // Scroll to top and lock body scroll when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      // Store original scroll position
+      const scrollY = window.scrollY;
+      
+      // IMMEDIATELY scroll to top (no smooth behavior for Safari)
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // Lock body scroll - Safari-friendly approach
+      const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalTop = document.body.style.top;
+      const originalWidth = document.body.style.width;
+      const originalHeight = document.body.style.height;
+      
+      // Use a more Safari-compatible approach
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+      
+      // Prevent iOS Safari bounce scrolling
+      document.body.style.touchAction = 'none';
+      document.documentElement.style.touchAction = 'none';
+      
+      // Force scroll to top multiple times (Safari needs this)
+      const forceScroll = () => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      };
+      
+      forceScroll();
+      setTimeout(forceScroll, 10);
+      setTimeout(forceScroll, 50);
+      setTimeout(forceScroll, 100);
+
+      return () => {
+        // Restore body scroll when modal closes
+        document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.width = originalWidth;
+        document.body.style.height = originalHeight;
+        document.body.style.touchAction = '';
+        document.documentElement.style.touchAction = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -101,28 +210,64 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
     onClose();
   };
 
-  if (!isOpen || !plan) return null;
+  if (!isOpen || !plan || !mounted) return null;
 
-  return (
+  const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div 
+        ref={containerRef}
+        data-modal-container
+        className="fixed z-[100] flex items-start justify-center overflow-y-auto"
+        style={{ 
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: viewportHeight,
+          paddingTop: 'max(1rem, env(safe-area-inset-top))',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+          WebkitOverflowScrolling: 'touch',
+          position: 'fixed',
+          overflowY: 'auto',
+        }}
+      >
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleClose}
-          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          className="fixed bg-black/90 backdrop-blur-sm"
+          style={{
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: viewportHeight,
+            position: 'fixed',
+            zIndex: -1,
+          }}
         />
 
         {/* Modal */}
         <motion.div
+          ref={modalRef}
+          data-modal-content
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto gpu-accelerated"
+          className="relative bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 sm:p-8 max-w-md w-full mb-4 overflow-y-auto gpu-accelerated"
           style={{
             boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            WebkitOverflowScrolling: 'touch',
+            marginTop: 'max(1rem, env(safe-area-inset-top))',
+            maxHeight: 'calc(100vh - max(2rem, calc(env(safe-area-inset-top) + env(safe-area-inset-bottom))))',
+            position: 'relative',
+            zIndex: 1,
           }}
         >
           {/* Close Button */}
@@ -291,5 +436,8 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
       </div>
     </AnimatePresence>
   );
+
+  // Render modal using portal at document.body level
+  return createPortal(modalContent, document.body);
 }
 
