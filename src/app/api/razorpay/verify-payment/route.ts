@@ -27,7 +27,7 @@ function verifyPaymentSignature(
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { orderId, paymentId, signature, vendorId, planId } = body;
+    const { orderId, paymentId, signature, vendorId, planId, vendorEmail, vendorName, vendorPhone } = body;
 
     if (!orderId || !paymentId || !signature || !vendorId || !planId) {
       return NextResponse.json(
@@ -61,16 +61,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Calculate amount with GST (18%)
+    const GST_RATE = 0.18;
+    const baseAmount = plan.amount;
+    const totalAmount = Math.round(baseAmount * (1 + GST_RATE));
+
     // Calculate subscription dates
     const startDate = new Date();
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + plan.duration);
 
-    // Create payment record
+    // Create payment record (store total amount with GST)
     const paymentRecordId = await createSubscriptionPayment({
       vendorId,
       subscriptionId: vendorId, // Same as vendorId for vendor_subscriptions
-      amount: plan.amount,
+      amount: totalAmount, // Total amount including GST
       planId: plan.id,
       planName: plan.name,
       razorpayOrderId: orderId,
@@ -85,7 +90,7 @@ export async function POST(request: NextRequest) {
       vendorId,
       planId: plan.id,
       planName: plan.name,
-      amount: plan.amount,
+      amount: totalAmount, // Total amount including GST
       duration: plan.duration,
       status: 'active',
       startDate,
@@ -100,6 +105,30 @@ export async function POST(request: NextRequest) {
       status: 'completed',
       completedAt: new Date(),
     });
+
+    // Send payment completed email notification
+    try {
+      const { sendPaymentNotification } = await import('@/lib/email');
+      await sendPaymentNotification({
+        vendorId,
+        vendorEmail: vendorEmail || undefined,
+        vendorName: vendorName || undefined,
+        vendorPhone: vendorPhone || undefined,
+        planId,
+        planName: plan.name,
+        amount: totalAmount, // Total amount including GST
+        orderId,
+        paymentId,
+        status: 'completed',
+        paymentDate: new Date(),
+      }).catch(err => {
+        console.error('Failed to send payment completed email:', err);
+        // Don't throw - email failure shouldn't break payment verification
+      });
+    } catch (error) {
+      console.error('Error sending payment completed email:', error);
+      // Don't throw - email failure shouldn't break payment verification
+    }
 
     return NextResponse.json({
       success: true,

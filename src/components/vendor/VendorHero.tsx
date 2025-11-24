@@ -175,16 +175,26 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
             >
               <motion.button
                 onClick={() => {
-                  const pricingSection = document.getElementById('pricing');
-                  if (pricingSection) {
-                    const offset = 80; // Navbar height
-                    const elementPosition = pricingSection.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - offset;
+                  const scrollToPricing = () => {
+                    const pricingSection = document.getElementById('pricing');
+                    if (!pricingSection) {
+                      setTimeout(scrollToPricing, 100);
+                      return;
+                    }
+                    
+                    // Simple, reliable method that works on all devices
+                    const offset = 80;
+                    const rect = pricingSection.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+                    const targetPosition = scrollTop + rect.top - offset;
+                    
                     window.scrollTo({
-                      top: offsetPosition,
+                      top: Math.max(0, targetPosition),
                       behavior: 'smooth',
                     });
-                  }
+                  };
+                  
+                  scrollToPricing();
                 }}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
@@ -213,16 +223,28 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
               {/* Pricing Button */}
               <motion.button
                 onClick={() => {
-                  const pricingSection = document.getElementById('pricing');
-                  if (pricingSection) {
-                    const offset = 80; // Navbar height
-                    const elementPosition = pricingSection.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - offset;
-                    window.scrollTo({
-                      top: offsetPosition,
-                      behavior: 'smooth',
-                    });
-                  }
+                  const scrollToPricing = () => {
+                    const pricingSection = document.getElementById('pricing');
+                    if (!pricingSection) {
+                      setTimeout(scrollToPricing, 100);
+                      return;
+                    }
+                    
+                    // Wait a bit for all lazy-loaded sections to render
+                    setTimeout(() => {
+                      const navbarHeight = 80;
+                      // Use offsetTop which is relative to offsetParent (usually body)
+                      const elementTop = pricingSection.offsetTop;
+                      const targetScroll = elementTop - navbarHeight;
+                      
+                      window.scrollTo({
+                        top: Math.max(0, targetScroll),
+                        behavior: 'smooth',
+                      });
+                    }, 150);
+                  };
+                  
+                  scrollToPricing();
                 }}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}

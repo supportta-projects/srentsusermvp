@@ -93,6 +93,25 @@ export async function POST(request: NextRequest) {
       // Update payment status
       // Note: You'll need to find payment record by orderId
       // This is a simplified version - you may need to query by orderId
+
+      // Send payment completed email notification
+      try {
+        const { sendPaymentNotification } = await import('@/lib/email');
+        await sendPaymentNotification({
+          vendorId,
+          planId,
+          planName: plan.name,
+          amount: plan.amount,
+          orderId: order.id,
+          paymentId: payment.id,
+          status: 'completed',
+          paymentDate: new Date(),
+        }).catch(err => {
+          console.error('Failed to send payment completed email:', err);
+        });
+      } catch (error) {
+        console.error('Error sending payment completed email:', error);
+      }
     }
 
     return NextResponse.json({ received: true });

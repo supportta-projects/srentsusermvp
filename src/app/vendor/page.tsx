@@ -11,9 +11,11 @@ import PricingSection from '@/components/vendor/PricingSection';
 // WhatsAppButton is rendered in root layout as direct child of <body>
 
 // Lazy load below-the-fold components for better initial load performance
-const FeaturesSection = dynamic(() => import('@/components/vendor/FeaturesSection'), {
-  loading: () => <div className="h-96 bg-black" />,
-});
+// TEMPORARILY DISABLED DYNAMIC IMPORT TO TEST CACHING ISSUE
+// const FeaturesSection = dynamic(() => import('@/components/vendor/FeaturesSection'), {
+//   loading: () => <div className="h-96 bg-black" />,
+// });
+import FeaturesSection from '@/components/vendor/FeaturesSection';
 
 const ProductDemoSection = dynamic(() => import('@/components/vendor/ProductDemoSection'), {
   loading: () => <div className="h-96 bg-black" />,

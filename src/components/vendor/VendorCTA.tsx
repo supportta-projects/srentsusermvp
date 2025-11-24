@@ -13,17 +13,29 @@ export default function VendorCTA({ onGetStarted }: VendorCTAProps) {
       onGetStarted();
       return;
     }
-    // Default: scroll to pricing
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      const offset = 80; // Navbar height
-      const elementPosition = pricingSection.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-    }
+    
+    const scrollToPricing = () => {
+      const pricingSection = document.getElementById('pricing');
+      if (!pricingSection) {
+        setTimeout(scrollToPricing, 100);
+        return;
+      }
+      
+      // Wait a bit for all lazy-loaded sections to render
+      setTimeout(() => {
+        const navbarHeight = 80;
+        // Use offsetTop which is relative to offsetParent (usually body)
+        const elementTop = pricingSection.offsetTop;
+        const targetScroll = elementTop - navbarHeight;
+        
+        window.scrollTo({
+          top: Math.max(0, targetScroll),
+          behavior: 'smooth',
+        });
+      }, 150);
+    };
+    
+    scrollToPricing();
   };
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black gpu-accelerated">

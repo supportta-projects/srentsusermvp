@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getShop, getProducts } from '@/lib/firestore';
-import { generateMetadata as generateSEOMetadata, getCanonicalUrl, generateKeywords } from '@/lib/seo';
+import { generateMetadata as generateSEOMetadata, getCanonicalUrl, generateKeywords, getSiteUrl } from '@/lib/seo';
 import { StructuredData, generateOrganizationStructuredData, generateBreadcrumbStructuredData } from '@/components/StructuredData';
 import ShopClient from './ShopClient';
-import ProductCardSkeleton from '@/components/ProductCardSkeleton';
-import Header from '@/components/Header';
 
 interface ShopPageProps {
   params: Promise<{ id: string }>;
@@ -38,7 +36,7 @@ export async function generateMetadata({ params }: ShopPageProps): Promise<Metad
   );
 
   const canonicalUrl = getCanonicalUrl(`/shops/${shop.id}`);
-  const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentorent.net'}/og-image.jpg`;
+  const ogImage = `${getSiteUrl()}/og-image.jpg`;
 
   return generateSEOMetadata({
     title,

@@ -99,7 +99,12 @@ export default function PricingSection({}: PricingSectionProps) {
   };
 
   return (
-    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0F0F0F]">
+    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0F0F0F] scroll-mt-20"
+      style={{
+        scrollMarginTop: '80px',
+        WebkitScrollMarginTop: '80px',
+      } as React.CSSProperties}
+    >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div

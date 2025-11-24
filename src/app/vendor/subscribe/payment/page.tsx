@@ -53,34 +53,173 @@ function PaymentPageContent() {
     setPaymentStatus('processing');
 
     try {
-      // TODO: Integrate with payment API
-      // For now, simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Generate a vendor ID (use email as ID for now, or generate UUID)
+      const vendorId = `vendor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Simulate successful payment
-      setPaymentStatus('success');
+      console.log('📧 [Payment] Creating Razorpay order...');
+      console.log('📧 [Payment] Vendor data:', {
+        vendorId,
+        vendorEmail: profileData.email,
+        vendorName: profileData.name,
+        vendorPhone: profileData.phone,
+        planId: plan.id,
+      });
       
-      // Clear sessionStorage
-      sessionStorage.removeItem('vendorProfile');
+      // Create Razorpay order
+      const response = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planId: plan.id,
+          vendorId: vendorId,
+          vendorEmail: profileData.email,
+          vendorName: profileData.name,
+          vendorPhone: profileData.phone,
+          amount: totalAmount, // Send total amount with GST
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create order');
+      }
+
+      const orderData = await response.json();
+      console.log('✅ [Payment] Order created:', orderData);
+
+      // Check if test mode
+      const isTestMode = orderData.testMode || orderData.key?.includes('dummy') || orderData.key?.includes('test');
+
+      // In test mode with dummy credentials, simulate payment
+      if (isTestMode && orderData.key?.includes('dummy')) {
+        console.log('🧪 [Payment] TEST MODE: Simulating payment...');
+        
+        // Simulate payment after 2 seconds
+        setTimeout(async () => {
+          try {
+            const mockResponse = {
+              razorpay_order_id: orderData.orderId,
+              razorpay_payment_id: `pay_test_${Date.now()}`,
+              razorpay_signature: 'test_signature_dummy',
+            };
+
+            console.log('📧 [Payment] Verifying test payment...');
+            // Verify payment (will skip signature check in test mode)
+            const verifyResponse = await fetch('/api/razorpay/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                orderId: mockResponse.razorpay_order_id,
+                paymentId: mockResponse.razorpay_payment_id,
+                signature: mockResponse.razorpay_signature,
+                vendorId: vendorId,
+                planId: plan.id,
+                vendorEmail: profileData.email,
+                vendorName: profileData.name,
+                vendorPhone: profileData.phone,
+              }),
+            });
+
+            if (!verifyResponse.ok) {
+              throw new Error('Payment verification failed');
+            }
+
+            const verifyResult = await verifyResponse.json();
+            console.log('✅ [Payment] Payment verified:', verifyResult);
+            
+            setPaymentStatus('success');
+            sessionStorage.removeItem('vendorProfile');
+            
+            // Redirect to success page after 2 seconds
+            setTimeout(() => {
+              router.push(`/vendor/subscribe/success?plan=${plan.id}`);
+            }, 2000);
+          } catch (error: any) {
+            console.error('❌ [Payment] Payment verification error:', error);
+            setPaymentStatus('error');
+            setIsSubmitting(false);
+          }
+        }, 2000);
+      } else {
+        // Real Razorpay integration (if you have real Razorpay keys)
+        // Load Razorpay script dynamically
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => {
+          const options: any = {
+            key: orderData.key,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: 'Rentorent',
+            description: `Subscription: ${plan.name}`,
+            order_id: orderData.orderId,
+            handler: async function (response: any) {
+              try {
+                console.log('📧 [Payment] Verifying payment...');
+                const verifyResponse = await fetch('/api/razorpay/verify-payment', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    orderId: response.razorpay_order_id,
+                    paymentId: response.razorpay_payment_id,
+                    signature: response.razorpay_signature,
+                    vendorId: vendorId,
+                    planId: plan.id,
+                    vendorEmail: profileData.email,
+                    vendorName: profileData.name,
+                    vendorPhone: profileData.phone,
+                  }),
+                });
+
+                if (!verifyResponse.ok) {
+                  throw new Error('Payment verification failed');
+                }
+
+                const verifyResult = await verifyResponse.json();
+                console.log('✅ [Payment] Payment verified:', verifyResult);
+                
+                setPaymentStatus('success');
+                sessionStorage.removeItem('vendorProfile');
+                
+                setTimeout(() => {
+                  router.push(`/vendor/subscribe/success?plan=${plan.id}`);
+                }, 2000);
+              } catch (error: any) {
+                console.error('❌ [Payment] Payment verification error:', error);
+                setPaymentStatus('error');
+                setIsSubmitting(false);
+              }
+            },
+            prefill: {
+              email: profileData.email,
+              name: profileData.name,
+              contact: profileData.phone,
+            },
+            theme: {
+              color: '#DC2626',
+            },
+            modal: {
+              ondismiss: function() {
+                setIsSubmitting(false);
+                setPaymentStatus('idle');
+              },
+            },
+          };
+
+          const razorpay = (window as any).Razorpay(options);
+          razorpay.open();
+        };
+        document.body.appendChild(script);
+      }
       
-      // TODO: Call payment API here
-      // const response = await fetch('/api/razorpay/create-order', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     planId: plan.id,
-      //     amount: plan.amount,
-      //     vendorData: profileData,
-      //   }),
-      // });
-      
-      // Redirect to success page after 2 seconds
-      setTimeout(() => {
-        router.push(`/vendor/subscribe/success?plan=${plan.id}`);
-      }, 2000);
-      
-    } catch (error) {
-      console.error('Payment error:', error);
+    } catch (error: any) {
+      console.error('❌ [Payment] Payment error:', error);
       setPaymentStatus('error');
       setIsSubmitting(false);
     }
@@ -117,6 +256,10 @@ function PaymentPageContent() {
   }
 
   const dailyPrice = Math.round(plan.amount / plan.duration);
+  const GST_RATE = 0.18; // 18% GST
+  const baseAmount = plan.amount;
+  const gstAmount = Math.round(baseAmount * GST_RATE);
+  const totalAmount = baseAmount + gstAmount;
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -194,11 +337,21 @@ function PaymentPageContent() {
             </div>
 
             <div className="border-t border-white/10 pt-6">
-              <div className="flex justify-between items-center text-lg">
-                <span className="text-gray-300 font-semibold">Total Amount</span>
-                <span className="text-white font-bold text-2xl">
-                  ₹{plan.amount.toLocaleString()}
-                </span>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-400">Subtotal:</span>
+                  <span className="text-gray-300">₹{baseAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-400">GST (18%):</span>
+                  <span className="text-gray-300">₹{gstAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center text-lg pt-2 border-t border-white/10">
+                  <span className="text-gray-300 font-semibold">Total Amount</span>
+                  <span className="text-white font-bold text-2xl">
+                    ₹{totalAmount.toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -253,7 +406,7 @@ function PaymentPageContent() {
                     Processing Payment...
                   </>
                 ) : (
-                  `Pay ₹${plan.amount.toLocaleString()}`
+                  `Pay ₹${totalAmount.toLocaleString()}`
                 )}
               </motion.button>
 

@@ -2,8 +2,7 @@
 
 import { useState, FormEvent, useEffect } from 'react';
 import { Product } from '@/types';
-import { createContact, getShop } from '@/lib/firestore';
-import { useAuth } from '@/contexts/AuthContext';
+import { getShop } from '@/lib/firestore';
 import Button from './ui/Button';
 import QuickActions from './ui/QuickActions';
 import Price from './ui/Price';
@@ -15,7 +14,6 @@ interface ContactModalProps {
 }
 
 export default function ContactModal({ product, isOpen, onClose }: ContactModalProps) {
-  const { customer } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -31,17 +29,6 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
     }
   }, [isOpen, product.shopId]);
 
-  // Pre-fill form with authenticated user data
-  useEffect(() => {
-    if (isOpen && customer) {
-      setFormData(prev => ({
-        name: prev.name || customer.name || '',
-        phone: prev.phone || customer.phone || '',
-        message: prev.message || '',
-      }));
-    }
-  }, [isOpen, customer]);
-
   if (!isOpen) return null;
 
   const submitContact = async () => {
@@ -55,14 +42,57 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
         throw new Error('Please enter a valid 10-digit phone number');
       }
 
-      await createContact({
-        productId: product.id,
-        shopId: product.shopId,
+      // Get shop details for email
+      const shopData = shop || await getShop(product.shopId);
+
+      // Prepare email data
+      const emailData = {
         name: formData.name || undefined,
         phone: cleanedPhone,
         message: formData.message || undefined,
-        status: 'pending',
+        productTitle: product.title,
+        productId: product.id,
+        shopId: product.shopId,
+        shopName: shopData?.name,
+        productPrice: product.pricePerDay,
+        productCity: product.city,
+      };
+
+      // Send email directly via API route (no Firebase)
+      console.log('📧 [Contact Form] Preparing to send email...');
+      console.log('📧 [Contact Form] Email data:', emailData);
+      
+      const apiUrl = '/api/email/send';
+      console.log('📧 [Contact Form] Calling API:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'contact',
+          data: emailData,
+        }),
       });
+
+      console.log('📧 [Contact Form] Response status:', response.status);
+      console.log('📧 [Contact Form] Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ [Contact Form] Error response:', errorText);
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText || 'Failed to send email' };
+        }
+        throw new Error(errorData.error || 'Failed to send contact request');
+      }
+
+      const result = await response.json();
+      console.log('✅ [Contact Form] Contact email sent successfully:', result);
 
       setSubmitStatus('success');
       
@@ -84,8 +114,8 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
         onClose();
         setSubmitStatus('idle');
       }, 2000);
-    } catch (error) {
-      console.error('Error submitting contact:', error);
+    } catch (error: any) {
+      console.error('❌ Error submitting contact:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -135,14 +165,6 @@ export default function ContactModal({ product, isOpen, onClose }: ContactModalP
           </div>
         )}
 
-        {/* Show customer info if authenticated */}
-        {customer && (
-          <div className="px-6 py-3 bg-[#DC2626]/10 border-b border-white/10">
-            <p className="text-xs text-gray-400 mb-1">Signed in as</p>
-            <p className="text-sm text-white font-medium">{customer.name}</p>
-            <p className="text-xs text-gray-400">{customer.email}</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
           <div>

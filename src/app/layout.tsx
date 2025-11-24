@@ -7,6 +7,7 @@ import { StructuredData, generateWebSiteStructuredData } from "@/components/Stru
 import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import FloatingWhatsapp from "@/components/WhatsAppButton";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -95,6 +96,9 @@ export default function RootLayout({
         {/* Floating layer – independent of page content */}
         {/* Direct child of <body>, outside all containers including AuthProvider */}
         <FloatingWhatsapp />
+        
+        {/* Vercel Analytics */}
+        <Analytics />
       </body>
     </html>
   );

@@ -43,6 +43,13 @@ RAZORPAY_WEBHOOK_SECRET=dummy_webhook_secret
 # RAZORPAY_KEY_SECRET=your_live_secret_key
 # NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxx
 # RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+
+# Email Configuration (for notifications)
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_USER=contact@rentorent.net
+SMTP_PASS=1@Abijithcb
+NOTIFICATION_EMAIL=info@abijithcb.com
 ```
 
 ## 3. Deploy Firestore Rules & Indexes
@@ -79,7 +86,16 @@ pnpm run dev
 
 Open http://localhost:3000
 
-## 6. (Optional) Set up Google Analytics
+## 6. Configure Email Notifications
+
+Email notifications are automatically sent to `info@abijithcb.com` for:
+- Contact form submissions
+- Payment pending (when order is created)
+- Payment completed (when payment is verified)
+
+The email configuration is already set up in `.env.local` with Hostinger SMTP settings. If you need to change the notification email, update `NOTIFICATION_EMAIL` in your `.env.local` file.
+
+## 7. (Optional) Set up Google Analytics
 
 Add your GA4 measurement ID to `.env.local`:
 
@@ -107,7 +123,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ## Next Steps
 
 1. Replace placeholder images with actual product photos
-2. Set up Firebase Functions for email notifications
+2. Email notifications are already configured and working
 3. Configure custom domain (if needed)
 4. Deploy to Vercel or Firebase Hosting
 

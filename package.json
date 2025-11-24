@@ -13,14 +13,17 @@
     "analyze-firestore": "tsx scripts/analyze-firestore-structure.ts",
     "verify-firebase": "tsx scripts/verify-firebase.ts",
     "check-env": "tsx scripts/check-env.ts",
-    "setup-env": "tsx scripts/setup-env.ts"
+    "setup-env": "tsx scripts/setup-env.ts",
+    "test-email": "tsx scripts/test-email.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "firebase": "^11.10.0",
     "firebase-admin": "^13.6.0",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.554.0",
     "next": "16.0.3",
+    "nodemailer": "^7.0.10",
     "razorpay": "^2.9.2",
     "react": "19.2.0",
     "react-dom": "19.2.0"
@@ -28,6 +31,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

@@ -184,6 +184,8 @@ export default function VendorSubscriptionPage() {
         body: JSON.stringify({
           planId: selectedPlan.id,
           vendorId: user.uid,
+          vendorEmail: user.email || undefined,
+          vendorName: user.displayName || undefined,
         }),
       });
 
@@ -219,6 +221,8 @@ export default function VendorSubscriptionPage() {
                 signature: response.razorpay_signature,
                 vendorId: user.uid,
                 planId: selectedPlan.id,
+                vendorEmail: user.email || undefined,
+                vendorName: user.displayName || undefined,
               }),
             });
 
@@ -278,6 +282,8 @@ export default function VendorSubscriptionPage() {
                 signature: mockResponse.razorpay_signature,
                 vendorId: user.uid,
                 planId: selectedPlan.id,
+                vendorEmail: user.email || undefined,
+                vendorName: user.displayName || undefined,
               }),
             });
 

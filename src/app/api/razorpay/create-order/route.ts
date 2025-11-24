@@ -15,7 +15,7 @@ const razorpay = new Razorpay({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { planId, vendorId } = body;
+    const { planId, vendorId, vendorEmail, vendorName, vendorPhone, amount: customAmount } = body;
 
     if (!planId || !vendorId) {
       return NextResponse.json(
@@ -33,14 +33,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Use custom amount if provided (already includes GST from frontend), otherwise calculate with GST
+    const GST_RATE = 0.18;
+    const finalAmount = customAmount || Math.round(plan.amount * (1 + GST_RATE));
+
     // In test/dummy mode, return mock order without calling Razorpay API
     if (IS_TEST_MODE && (RAZORPAY_KEY_ID.includes('dummy') || !process.env.RAZORPAY_KEY_ID)) {
       console.log('🧪 TEST MODE: Using dummy Razorpay order');
       const mockOrderId = `order_test_${Date.now()}`;
       
+      // Send payment pending email notification for test mode
+      try {
+        const { sendPaymentNotification } = await import('@/lib/email');
+        await sendPaymentNotification({
+          vendorId,
+          vendorEmail: vendorEmail || undefined,
+          vendorName: vendorName || undefined,
+          vendorPhone: vendorPhone || undefined,
+          planId,
+          planName: plan.name,
+          amount: finalAmount,
+          orderId: mockOrderId,
+          status: 'pending',
+        }).catch(err => {
+          console.error('Failed to send payment pending email:', err);
+        });
+      } catch (error) {
+        console.error('Error sending payment pending email:', error);
+      }
+      
       return NextResponse.json({
         orderId: mockOrderId,
-        amount: plan.amount * 100,
+        amount: finalAmount * 100, // Convert to paise
         currency: 'INR',
         key: RAZORPAY_KEY_ID,
         testMode: true,
@@ -50,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     // Create Razorpay order (live or test with real Razorpay account)
     const options = {
-      amount: plan.amount * 100, // Convert to paise
+      amount: finalAmount * 100, // Convert to paise (total with GST)
       currency: 'INR',
       receipt: `sub_${vendorId}_${Date.now()}`,
       notes: {
@@ -61,6 +85,28 @@ export async function POST(request: NextRequest) {
     };
 
     const order = await razorpay.orders.create(options);
+
+    // Send payment pending email notification
+    try {
+      const { sendPaymentNotification } = await import('@/lib/email');
+      await sendPaymentNotification({
+        vendorId,
+        vendorEmail: vendorEmail || undefined,
+        vendorName: vendorName || undefined,
+        vendorPhone: vendorPhone || undefined,
+        planId,
+        planName: plan.name,
+        amount: finalAmount,
+        orderId: order.id,
+        status: 'pending',
+      }).catch(err => {
+        console.error('Failed to send payment pending email:', err);
+        // Don't throw - email failure shouldn't break order creation
+      });
+    } catch (error) {
+      console.error('Error sending payment pending email:', error);
+      // Don't throw - email failure shouldn't break order creation
+    }
 
     return NextResponse.json({
       orderId: order.id,

@@ -11,16 +11,28 @@ export default function VendorNavbar() {
   const router = useRouter();
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offset = 80; // Navbar height
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-    }
+    const scrollToElement = () => {
+      const element = document.getElementById(sectionId);
+      if (!element) {
+        setTimeout(scrollToElement, 100);
+        return;
+      }
+      
+      // Wait a bit for all lazy-loaded sections to render
+      setTimeout(() => {
+        const navbarHeight = 80;
+        // Use offsetTop which is relative to offsetParent (usually body)
+        const elementTop = element.offsetTop;
+        const targetScroll = elementTop - navbarHeight;
+        
+        window.scrollTo({
+          top: Math.max(0, targetScroll),
+          behavior: 'smooth',
+        });
+      }, 150);
+    };
+    
+    scrollToElement();
   };
 
   const navItems = [
