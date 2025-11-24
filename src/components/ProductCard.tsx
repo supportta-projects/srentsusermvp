@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import ContactModal from './ContactModal';
 import { getShop } from '@/lib/firestore';
 import Price from './ui/Price';
@@ -17,29 +17,35 @@ interface ProductCardProps {
   onContactClick?: () => void;
 }
 
-export default function ProductCard({ product, onContactClick }: ProductCardProps) {
+function ProductCard({ product, onContactClick }: ProductCardProps) {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [shop, setShop] = useState<any>(null);
 
   useEffect(() => {
-    getShop(product.shopId).then(setShop);
+    let cancelled = false;
+    getShop(product.shopId).then((shopData) => {
+      if (!cancelled) {
+        setShop(shopData);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [product.shopId]);
 
-  const handleContactClick = () => {
+  const handleContactClick = useCallback(() => {
     setIsContactModalOpen(true);
     onContactClick?.();
-  };
+  }, [onContactClick]);
 
-  const getBrand = (title: string): string => {
+  const brand = useMemo(() => {
     const brands = ['Canon', 'Sony', 'Nikon', 'Fujifilm', 'Panasonic', 'Olympus', 'Pentax', 'Leica', 'Godox', 'Profoto', 'Manfrotto', 'DJI'];
     for (const brand of brands) {
-      if (title.includes(brand)) return brand;
+      if (product.title.includes(brand)) return brand;
     }
     return '';
-  };
-
-  const brand = getBrand(product.title);
+  }, [product.title]);
 
   return (
     <>
@@ -151,3 +157,5 @@ export default function ProductCard({ product, onContactClick }: ProductCardProp
     </>
   );
 }
+
+export default memo(ProductCard);

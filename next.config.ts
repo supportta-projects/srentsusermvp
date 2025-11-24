@@ -29,6 +29,13 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
   
+  // Performance optimizations - remove console.log in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+  
   // Turbopack configuration (Next.js 16 default)
   turbopack: {},
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo, useMemo } from 'react';
 import { Package, ShoppingCart, Users, UserCog, BarChart3, Smartphone } from 'lucide-react';
 import Image from 'next/image';
 
@@ -67,7 +67,7 @@ const features = [
   },
 ];
 
-export default function FeaturesSection() {
+function FeaturesSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function FeaturesSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="features" className="py-10 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8 bg-black" data-variant="single">
+    <section ref={sectionRef} id="features" className="py-10 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8 bg-black">
       <div className="max-w-7xl mx-auto">
         {/* Section Header - Mobile Optimized */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16 animate-slide-up">
@@ -104,15 +104,13 @@ export default function FeaturesSection() {
         </div>
 
         {/* Features Grid - Modern Mobile Design */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8" data-debug="features-grid">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
-                key={index}
+                key={feature.title}
                 className="feature-card animate-on-scroll group relative overflow-hidden transition-all duration-300 gpu-accelerated touch-manipulation border border-white/8 rounded-2xl sm:rounded-2xl lg:rounded-3xl active:scale-[0.98] sm:hover:shadow-2xl sm:hover:shadow-black/50 sm:hover:-translate-y-1 sm:hover:scale-[1.02] bg-[#0F0F0F]"
-                data-card-index={index}
-                data-card-title={feature.title}
                 style={{ 
                   transitionDelay: `${index * 50}ms`,
                   WebkitTapHighlightColor: 'transparent',
@@ -131,27 +129,35 @@ export default function FeaturesSection() {
                     {/* Mobile Image - Centered and clean */}
                     {feature.mobileImage && (
                       <div className="w-full h-full flex items-center justify-center p-5 md:hidden">
-                        <img
+                        <Image
                           src={feature.mobileImage}
                           alt={feature.title}
+                          width={400}
+                          height={300}
                           className="w-full h-full object-contain object-center max-h-full transition-transform duration-500 ease-out"
-                          loading="lazy"
-                          decoding="async"
+                          loading={index < 3 ? "eager" : "lazy"}
+                          quality={85}
                         />
                       </div>
                     )}
                     {/* Desktop Image - SVG/Unsplash */}
-                    <img
-                      src={feature.image}
-                      alt={feature.title}
-                      className={`w-full h-full ${
-                        feature.isSvg 
-                          ? 'hidden md:block object-contain object-center p-4 sm:p-5 md:p-6 lg:p-8' 
-                          : 'hidden md:block object-cover'
-                      } sm:group-hover:scale-110 transition-transform duration-700 ease-out`}
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <div className={`hidden md:block relative w-full h-full ${
+                      feature.isSvg ? 'p-4 sm:p-5 md:p-6 lg:p-8' : ''
+                    }`}>
+                      <Image
+                        src={feature.image}
+                        alt={feature.title}
+                        fill
+                        className={`${
+                          feature.isSvg 
+                            ? 'object-contain object-center' 
+                            : 'object-cover'
+                        } sm:group-hover:scale-110 transition-transform duration-700 ease-out`}
+                        loading={index < 3 ? "eager" : "lazy"}
+                        quality={85}
+                        sizes="(max-width: 768px) 0vw, 33vw"
+                      />
+                    </div>
                     
                     {/* Subtle gradient overlay for depth */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
@@ -195,4 +201,6 @@ export default function FeaturesSection() {
     </section>
   );
 }
+
+export default memo(FeaturesSection);
 

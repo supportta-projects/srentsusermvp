@@ -82,57 +82,60 @@ export default function HomeClient() {
       setLoadingMore(false);
     }
   }, [filters, sortBy, selectedCity, searchQuery, lastDoc]);
-
-  useEffect(() => {
-    loadProducts(true);
-    loadShops();
-  }, [filters, sortBy, selectedCity, searchQuery]);
-
-  const loadShops = async () => {
+  
+  const loadShops = useCallback(async () => {
     try {
       const shopsData = await getShops(selectedCity);
       setShops(shopsData);
     } catch (error) {
       console.error('Error loading shops:', error);
     }
-  };
+  }, [selectedCity]);
 
-  const handleSearch = (query: string) => {
+  useEffect(() => {
+    loadProducts(true);
+  }, [filters, sortBy, selectedCity, searchQuery, loadProducts]);
+  
+  useEffect(() => {
+    loadShops();
+  }, [loadShops]);
+
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     setFilters((prev) => ({ ...prev, searchQuery: query }));
-  };
+  }, []);
 
-  const handleCityChange = (city: string) => {
+  const handleCityChange = useCallback((city: string) => {
     setSelectedCity(city);
-  };
+  }, []);
 
-  const handleFiltersChange = (newFilters: FilterOptions) => {
+  const handleFiltersChange = useCallback((newFilters: FilterOptions) => {
     setFilters(newFilters);
-  };
+  }, []);
 
-  const handleSortChange = (newSort: SortOption) => {
+  const handleSortChange = useCallback((newSort: SortOption) => {
     setSortBy(newSort);
-  };
+  }, []);
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     setFilters({});
     setSelectedCity('');
     setSearchQuery('');
-  };
+  }, []);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (!loadingMore && hasMore) {
       loadProducts(false);
     }
-  };
+  }, [loadingMore, hasMore, loadProducts]);
 
-  const handleContactClick = () => {
+  const handleContactClick = useCallback(() => {
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'contact_click', {
         event_category: 'engagement',
       });
     }
-  };
+  }, []);
 
   const handleCategoryClick = (category: string) => {
     if (filters.category === category) {
@@ -142,13 +145,15 @@ export default function HomeClient() {
     }
   };
 
-  const productsByShop = products.reduce((acc, product) => {
-    if (!acc[product.shopId]) {
-      acc[product.shopId] = [];
-    }
-    acc[product.shopId].push(product);
-    return acc;
-  }, {} as Record<string, Product[]>);
+  const productsByShop = useMemo(() => {
+    return products.reduce((acc, product) => {
+      if (!acc[product.shopId]) {
+        acc[product.shopId] = [];
+      }
+      acc[product.shopId].push(product);
+      return acc;
+    }, {} as Record<string, Product[]>);
+  }, [products]);
 
   return (
     <div className="min-h-screen bg-black">

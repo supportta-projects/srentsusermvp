@@ -11,11 +11,9 @@ import PricingSection from '@/components/vendor/PricingSection';
 // WhatsAppButton is rendered in root layout as direct child of <body>
 
 // Lazy load below-the-fold components for better initial load performance
-// TEMPORARILY DISABLED DYNAMIC IMPORT TO TEST CACHING ISSUE
-// const FeaturesSection = dynamic(() => import('@/components/vendor/FeaturesSection'), {
-//   loading: () => <div className="h-96 bg-black" />,
-// });
-import FeaturesSection from '@/components/vendor/FeaturesSection';
+const FeaturesSection = dynamic(() => import('@/components/vendor/FeaturesSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
 
 const ProductDemoSection = dynamic(() => import('@/components/vendor/ProductDemoSection'), {
   loading: () => <div className="h-96 bg-black" />,
@@ -60,21 +58,17 @@ const VendorFooter = dynamic(() => import('@/components/vendor/VendorFooter'), {
 export default function VendorLandingPage() {
   const router = useRouter();
 
-  // Scroll to top on mount - especially important for mobile
+  // Scroll to top on mount - optimized for performance
   useEffect(() => {
-    // Scroll to top immediately on mount
-    window.scrollTo(0, 0);
+    if (typeof window === 'undefined') return;
     
-    // Also ensure scroll position is reset after a short delay (for mobile browsers)
-    const timer = setTimeout(() => {
-      window.scrollTo(0, 0);
-      // Force scroll on mobile browsers
-      if (typeof window !== 'undefined' && window.history.scrollRestoration) {
-        window.history.scrollRestoration = 'manual';
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
+    // Single scroll call - more efficient
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    
+    // Set scroll restoration once
+    if (window.history.scrollRestoration) {
+      window.history.scrollRestoration = 'manual';
+    }
   }, []);
 
   return (

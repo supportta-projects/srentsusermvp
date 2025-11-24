@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import RentOrentLogo from './RentOrentLogo';
 
-export default function VendorNavbar() {
+function VendorNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = useCallback((sectionId: string) => {
     const scrollToElement = () => {
       const element = document.getElementById(sectionId);
       if (!element) {
@@ -33,7 +33,7 @@ export default function VendorNavbar() {
     };
     
     scrollToElement();
-  };
+  }, []);
 
   const navItems = [
     { label: 'Features', href: '#features', onClick: () => scrollToSection('features') },
@@ -144,4 +144,6 @@ export default function VendorNavbar() {
     </nav>
   );
 }
+
+export default memo(VendorNavbar);
 

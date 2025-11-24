@@ -19,9 +19,9 @@ export async function generateMetadata({ params }: ShopPageProps): Promise<Metad
     };
   }
 
-  // Get shop products count for description
-  const productsData = await getProducts({}, 'relevance', 100);
-  const shopProducts = productsData.products.filter(p => p.shopId === id);
+  // Get shop products count for description - optimized to only fetch shop products
+  const productsData = await getProducts({ shopId: id }, 'relevance', 20);
+  const shopProducts = productsData.products;
   const productCount = shopProducts.length;
 
   const title = `${shop.name} - Rental Shop in ${shop.city} | rentorent`;
@@ -75,9 +75,9 @@ export default async function ShopDetailPage({ params }: ShopPageProps) {
     notFound();
   }
 
-  // Get all products for this shop
-  const productsData = await getProducts({}, 'relevance', 100);
-  const shopProducts = productsData.products.filter(p => p.shopId === id);
+  // Get products for this shop - optimized query
+  const productsData = await getProducts({ shopId: id }, 'relevance', 50);
+  const shopProducts = productsData.products;
 
   const orgStructuredData = generateOrganizationStructuredData(shop, shopProducts.length);
   const breadcrumbs = generateBreadcrumbStructuredData([

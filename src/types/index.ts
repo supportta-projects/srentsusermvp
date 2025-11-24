@@ -48,6 +48,7 @@ export interface Contact {
 }
 
 export type FilterOptions = {
+  shopId?: string; // Filter by shop ID for performance
   city?: string;
   category?: string; // Generic category
   minPrice?: number;

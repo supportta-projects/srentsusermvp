@@ -19,12 +19,16 @@ export async function getProducts(
   pageSize: number = 20,
   lastDoc?: QueryDocumentSnapshot
 ): Promise<{ products: Product[]; lastDoc: QueryDocumentSnapshot | null }> {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
+  // Simulate network delay - reduced for better performance
+  await new Promise(resolve => setTimeout(resolve, 100));
   
   let filteredProducts = [...mockProducts];
   
-  // Apply filters
+  // Apply filters - shopId first for performance
+  if (filters.shopId) {
+    filteredProducts = filteredProducts.filter(p => p.shopId === filters.shopId);
+  }
+  
   if (filters.city) {
     filteredProducts = filteredProducts.filter(p => p.city === filters.city);
   }
