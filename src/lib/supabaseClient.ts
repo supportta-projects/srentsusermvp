@@ -40,10 +40,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
         },
       }
     );
-  } else if (process.env.NODE_ENV === 'development') {
-    // In development, log error but don't crash
+  } else {
+    // In both development and production runtime, create dummy client
+    // This prevents app crash - user will see errors when trying to use Supabase features
     console.error('❌', errorMessage);
+    console.error('⚠️  Creating dummy Supabase client. App will work but authentication features will fail.');
+    console.error('📝 To fix: Add environment variables in Vercel project settings → Environment Variables');
+    
     // Create a dummy client to prevent app crash
+    // The app will still load, but Supabase features won't work
     supabase = createClient(
       'https://placeholder.supabase.co',
       'placeholder-key',
@@ -55,9 +60,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
         },
       }
     );
-  } else {
-    // In production runtime, throw error if vars are missing
-    throw new Error(errorMessage);
   }
 } else {
   // Create Supabase client with actual credentials

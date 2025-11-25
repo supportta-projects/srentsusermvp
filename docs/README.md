@@ -29,6 +29,9 @@ Welcome to the comprehensive documentation for the **RentOrent MVP** project. Th
 - **[PERFORMANCE-OPTIMIZATION.md](./PERFORMANCE-OPTIMIZATION.md)** - Complete performance optimization guide
 - **[PERFORMANCE-ISSUES-SUMMARY.md](./PERFORMANCE-ISSUES-SUMMARY.md)** - Quick summary of performance issues and fixes
 
+### 🔧 Troubleshooting
+- **[FIX-SUPABASE-ENV-ERROR.md](./FIX-SUPABASE-ENV-ERROR.md)** - How to fix missing Supabase environment variables error
+
 ## 🚀 Quick Start for New Developers
 
 If you're new to this project, follow this reading order:

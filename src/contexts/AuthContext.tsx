@@ -66,7 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
       
       if (error) {
-        console.error('Error getting session:', error);
+        // Check if it's a configuration error (missing env vars)
+        if (error.message?.includes('placeholder') || error.message?.includes('Invalid API key')) {
+          console.warn('⚠️  Supabase not configured. Please set environment variables in Vercel.');
+        } else {
+          console.error('Error getting session:', error);
+        }
         setLoading(false);
         return;
       }
@@ -75,23 +80,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(mapSupabaseUserToAppUser(supabaseUser));
       setCustomer(createCustomerFromUser(supabaseUser));
       setLoading(false);
-    });
-
-    // Listen for auth state changes (this will also fire immediately with current session)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    }).catch((err) => {
       if (!mounted) return;
-      
-      const supabaseUser = session?.user || null;
-      setUser(mapSupabaseUserToAppUser(supabaseUser));
-      setCustomer(createCustomerFromUser(supabaseUser));
+      // Handle errors gracefully - don't crash the app
+      if (err.message?.includes('placeholder') || err.message?.includes('Invalid API key')) {
+        console.warn('⚠️  Supabase not configured. Please set environment variables in Vercel.');
+      }
       setLoading(false);
     });
 
+    // Listen for auth state changes (this will also fire immediately with current session)
+    let subscription: { unsubscribe: () => void } | null = null;
+    
+    try {
+      const {
+        data: { subscription: authSubscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!mounted) return;
+        
+        const supabaseUser = session?.user || null;
+        setUser(mapSupabaseUserToAppUser(supabaseUser));
+        setCustomer(createCustomerFromUser(supabaseUser));
+        setLoading(false);
+      });
+      subscription = authSubscription;
+    } catch (err: any) {
+      // Handle errors gracefully if Supabase is not configured
+      if (err.message?.includes('placeholder') || err.message?.includes('Invalid API key')) {
+        console.warn('⚠️  Supabase not configured. Please set environment variables in Vercel.');
+      }
+      setLoading(false);
+    }
+
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, []);
 
