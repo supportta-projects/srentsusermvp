@@ -1,0 +1,42 @@
+# Supabase Environment Variables for Vercel
+
+## Copy these exact variable names and add your values:
+
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+---
+
+## How to Get Your Values:
+
+1. Go to: https://supabase.com/dashboard
+2. Select your project
+3. Click: Settings → API
+4. Copy:
+   - "Project URL" → Use for NEXT_PUBLIC_SUPABASE_URL
+   - "anon public" key → Use for NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+---
+
+## Example Format:
+
+NEXT_PUBLIC_SUPABASE_URL=https://czwrkvmddpczymlkjqmw.supabase.co
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6d3Jrdm1kZHBjenltbGtqcW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5ODA1MDAsImV4cCI6MjA3OTU1NjUwMH0.foHLZQVXyf7aAVWArZKGsYDaFzvBw4FpYVXDOp8Ko04
+
+---
+
+## Add to Vercel:
+
+1. Vercel Dashboard → Your Project → Settings → Environment Variables
+2. Add each variable:
+   - Key: NEXT_PUBLIC_SUPABASE_URL
+   - Value: (your Project URL from Supabase)
+   - Environment: Production, Preview, Development
+   
+   - Key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+   - Value: (your anon key from Supabase)
+   - Environment: Production, Preview, Development
+3. Redeploy your project
+
