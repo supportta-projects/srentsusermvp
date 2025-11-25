@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { getSubscriptionPlans } from '@/lib/subscriptions';
 import { SubscriptionPlan } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PricingSectionProps {}
 
 export default function PricingSection({}: PricingSectionProps) {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -354,8 +356,14 @@ export default function PricingSection({}: PricingSectionProps) {
 
                       <motion.button
                         onClick={() => {
-                          // Redirect to profile page
-                          router.push(`/vendor/subscribe/profile?plan=${plan.id}`);
+                          // Check if user is logged in
+                          if (!user && !authLoading) {
+                            // Redirect to register with plan ID
+                            router.push(`/register?plan=${plan.id}&redirect=checkout`);
+                          } else if (user) {
+                            // User is logged in, go directly to checkout
+                            router.push(`/vendor/checkout?plan=${plan.id}`);
+                          }
                         }}
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.98 }}

@@ -1,14 +1,38 @@
 'use client';
 
-import { useState, memo, useCallback } from 'react';
+import { useState, useEffect, memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import RentOrentLogo from './RentOrentLogo';
+import { useAuth } from '@/contexts/AuthContext';
+import { getCurrentUserProfile, getUserDisplayName } from '@/lib/supabase-profiles';
 
 function VendorNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [displayName, setDisplayName] = useState<string>('');
+  const [profileInitial, setProfileInitial] = useState<string>('');
   const router = useRouter();
+  const { user, signOut, loading: authLoading } = useAuth();
+
+  // Fetch profile and update display name
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const profile = await getCurrentUserProfile();
+        const name = getUserDisplayName(profile, user.email);
+        setDisplayName(name);
+        setProfileInitial(name.charAt(0).toUpperCase());
+      } else {
+        setDisplayName('');
+        setProfileInitial('');
+      }
+    };
+    
+    fetchProfile();
+  }, [user]);
 
   const scrollToSection = useCallback((sectionId: string) => {
     const scrollToElement = () => {
@@ -81,25 +105,113 @@ function VendorNavbar() {
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              onClick={() => router.push('/vendor/login')}
-              className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
-            >
-              Log in
-            </motion.button>
+          <div className="hidden md:flex items-center space-x-3">
+            {authLoading ? (
+              <div className="w-8 h-8 border-2 border-gray-600 border-t-[#DC2626] rounded-full animate-spin"></div>
+            ) : user ? (
+              <div className="relative">
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#DC2626] flex items-center justify-center text-white font-semibold text-xs">
+                    {profileInitial || <User className="w-4 h-4" />}
+                  </div>
+                  <span className="hidden lg:inline">{displayName || 'User'}</span>
+                </motion.button>
+                
+                {isUserMenuOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-[49]" 
+                      onClick={() => setIsUserMenuOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute right-0 mt-2 w-56 bg-[#1a1a1a] rounded-xl shadow-2xl border border-white/10 z-[100] overflow-hidden backdrop-blur-xl"
+                    >
+                      <div className="px-4 py-3 border-b border-white/5">
+                        <p className="text-sm text-white font-medium">{displayName || 'User'}</p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                      >
+                        Profile
+                      </Link>
+                      <div className="border-t border-white/5 my-1" />
+                      <button
+                        onClick={async () => {
+                          try {
+                            await signOut();
+                            setIsUserMenuOpen(false);
+                            router.push('/vendor');
+                            // Removed router.refresh() - not needed, causes unnecessary reload
+                          } catch (error) {
+                            console.error('Error signing out:', error);
+                          }
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                      >
+                        Logout
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                </motion.div>
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  onClick={() => router.push('/register')}
+                  className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Sign Up
+                </motion.button>
+              </>
+            )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile Menu Button / Profile Icon */}
+          <div className="md:hidden">
+            {authLoading ? (
+              <div className="w-8 h-8 border-2 border-gray-600 border-t-[#DC2626] rounded-full animate-spin"></div>
+            ) : user ? (
+              <Link
+                href="/profile"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-[#DC2626] text-white font-semibold text-sm hover:bg-[#B91C1C] transition-colors"
+              >
+                {profileInitial || <User className="w-5 h-5" />}
+              </Link>
+            ) : (
+              <button
+                className="text-white p-2"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -126,16 +238,58 @@ function VendorNavbar() {
                   {item.label}
                 </button>
               ))}
-              <div className="pt-4 border-t border-white/10">
-                <button
-                  onClick={() => {
-                    router.push('/vendor/login');
-                    setIsMenuOpen(false);
-                  }}
-                  className="block w-full px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
-                >
-                  Log in
-                </button>
+              <div className="pt-4 border-t border-white/10 space-y-2">
+                {authLoading ? (
+                  <div className="w-8 h-8 border-2 border-gray-600 border-t-[#DC2626] rounded-full animate-spin mx-auto"></div>
+                ) : user ? (
+                  <>
+                    <div className="px-4 py-2">
+                      <p className="text-sm text-white font-medium">{displayName || 'User'}</p>
+                      <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                    </div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await signOut();
+                          setIsMenuOpen(false);
+                          router.push('/vendor');
+                          router.refresh();
+                        } catch (error) {
+                          console.error('Error signing out:', error);
+                        }
+                      }}
+                      className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg text-left"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block w-full px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors rounded-lg"
+                    >
+                      Sign In
+                    </Link>
+                    <button
+                      onClick={() => {
+                        router.push('/register');
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Sign Up
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

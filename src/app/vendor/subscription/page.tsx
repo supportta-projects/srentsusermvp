@@ -27,6 +27,33 @@ export default function VendorSubscriptionPage() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Redirect to register if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const planId = urlParams.get('plan');
+      if (planId) {
+        router.push(`/register?plan=${planId}&redirect=payment`);
+      } else {
+        router.push('/register?redirect=payment');
+      }
+    }
+  }, [user, authLoading, router]);
+
+  // Get plan ID from URL and set selected plan
+  useEffect(() => {
+    if (user && !authLoading && plans.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const planId = urlParams.get('plan');
+      if (planId) {
+        const plan = plans.find(p => p.id === planId);
+        if (plan) {
+          setSelectedPlan(plan);
+        }
+      }
+    }
+  }, [user, authLoading, plans]);
+
   // Mock plans for UI testing when Firestore is not available
   const getMockPlans = (): SubscriptionPlan[] => [
     {
