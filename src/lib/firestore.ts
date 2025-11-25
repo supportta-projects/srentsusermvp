@@ -1,4 +1,4 @@
-// Mock implementation for UI development - Replace with Firebase when ready
+// Mock implementation for UI development - Uses mock data (can be replaced with Supabase or other database)
 import { Product, Contact, FilterOptions, SortOption } from '@/types';
 import { mockProducts, mockShops } from './mockData';
 

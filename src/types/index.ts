@@ -61,7 +61,7 @@ export type FilterOptions = {
 export type SortOption = 'relevance' | 'price-low' | 'price-high' | 'newest';
 
 export interface Customer {
-  id: string; // Firebase Auth UID
+  id: string; // Supabase Auth UID
   email: string;
   name: string;
   phone?: string;
@@ -86,8 +86,8 @@ export interface SubscriptionPlan {
 }
 
 export interface VendorSubscription {
-  id: string; // Document ID = vendorId (Firebase Auth UID)
-  vendorId: string; // Firebase Auth UID (same as document ID)
+  id: string; // Document ID = vendorId (Supabase Auth UID)
+  vendorId: string; // Supabase Auth UID (same as document ID)
   shopId?: string; // Optional: link to rental_shops if needed
   
   // Subscription Details
@@ -119,7 +119,7 @@ export interface VendorSubscription {
 
 export interface SubscriptionPayment {
   id: string; // Auto-generated
-  vendorId: string; // Firebase Auth UID
+  vendorId: string; // Supabase Auth UID
   subscriptionId: string; // Links to vendor_subscriptions document ID
   
   // Payment Details

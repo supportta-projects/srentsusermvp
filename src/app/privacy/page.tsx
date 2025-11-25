@@ -71,7 +71,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">7. Third-Party Services</h2>
             <p>
-              We use third-party services including Firebase (for data storage) and Razorpay (for payments). These services have their own privacy policies.
+              We use third-party services including Supabase (for authentication and data storage) and Razorpay (for payments). These services have their own privacy policies.
             </p>
           </section>
 

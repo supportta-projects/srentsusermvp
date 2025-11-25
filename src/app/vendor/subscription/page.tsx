@@ -152,13 +152,13 @@ export default function VendorSubscriptionPage() {
         // Timeout or Firestore error - use mock plans
         console.log('Firestore timeout or error, using mock plans');
         setPlans(getMockPlans());
-        setError('Using demo plans. Firebase connection may be needed for production.');
+        setError('Using demo plans. Database connection may be needed for production.');
       }
     } catch (error) {
       console.error('Error loading subscription data:', error);
       // Use mock plans if Firestore fails
       setPlans(getMockPlans());
-      setError('Using demo plans. Firebase connection may be needed for production.');
+      setError('Using demo plans. Database connection may be needed for production.');
     } finally {
       setLoading(false);
     }

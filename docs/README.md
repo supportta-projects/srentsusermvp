@@ -31,6 +31,7 @@ Welcome to the comprehensive documentation for the **RentOrent MVP** project. Th
 
 ### 🔧 Troubleshooting
 - **[FIX-SUPABASE-ENV-ERROR.md](./FIX-SUPABASE-ENV-ERROR.md)** - How to fix missing Supabase environment variables error
+- **[FIREBASE-REMOVAL.md](./FIREBASE-REMOVAL.md)** - Firebase removal summary and migration notes
 
 ## 🚀 Quick Start for New Developers
 

@@ -1,5 +1,5 @@
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from './firebase';
+// Firebase removed - using Supabase and mock data instead
+// This seed function is kept for reference but no longer uses Firebase
 import { Product, Shop } from '@/types';
 
 const shops: Omit<Shop, 'id'>[] = [
@@ -780,45 +780,16 @@ const products: Omit<Product, 'id'>[] = [
   },
 ];
 
+// Firebase removed - seed function disabled
+// The app now uses mock data from mockData.ts instead of Firebase
 export async function seedDatabase() {
-  console.log('Starting database seed...');
-  
-  // Create shops first
-  const shopIds: string[] = [];
-  for (const shop of shops) {
-    const docRef = await addDoc(collection(db, 'shops'), {
-      ...shop,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    });
-    shopIds.push(docRef.id);
-    console.log(`Created shop: ${shop.name} (${docRef.id})`);
-  }
-  
-  // Create products with shop IDs
-  const cityToShopIndex: Record<string, number> = {
-    'Bengaluru': 0,
-    'Mumbai': 1,
-    'Delhi': 2,
-    'Chennai': 3,
-    'Kottayam': 4,
-    'Thiruvalla': 5,
-    'Pala': 6,
-    'Kochi': 7,
-  };
-  
-  for (const product of products) {
-    const shopIndex = cityToShopIndex[product.city];
-    const shopId = shopIds[shopIndex];
-    
-    const docRef = await addDoc(collection(db, 'products'), {
-      ...product,
-      shopId,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    });
-    console.log(`Created product: ${product.title} (${docRef.id})`);
-  }
-  
-  console.log('Database seed completed!');
+  console.log('⚠️  Firebase has been removed from this project.');
+  console.log('📝 The app now uses mock data (see src/lib/mockData.ts).');
+  console.log('✅ No database seeding needed - mock data is used automatically.');
+  console.log('');
+  console.log('If you need to seed a database in the future, consider:');
+  console.log('  - Using Supabase (already integrated for auth/profiles)');
+  console.log('  - Using a different database solution');
+  console.log('');
+  console.log('Seed function completed (no-op).');
 }

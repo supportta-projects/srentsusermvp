@@ -41,7 +41,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
         resetForm();
       }
     } catch (err: any) {
-      // Handle Firebase auth errors
+      // Handle authentication errors
       let errorMessage = 'An error occurred';
       if (err.code === 'auth/user-not-found') {
         errorMessage = 'No account found with this email';
