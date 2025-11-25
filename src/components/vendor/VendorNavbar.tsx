@@ -74,11 +74,12 @@ function VendorNavbar() {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             className="flex items-center"
+            style={{ willChange: 'transform, opacity' }}
           >
             <button
-              onClick={() => router.push('/vendor')}
+              onClick={() => router.push('/')}
               className="flex items-center"
             >
               <RentOrentLogo size="md" />
@@ -94,10 +95,12 @@ function VendorNavbar() {
                   e.preventDefault();
                   if (item.onClick) item.onClick();
                 }}
-                initial={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.3, delay: index * 0.05, ease: [0.4, 0, 0.2, 1] }}
+                whileHover={{ y: -2 }}
                 className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                style={{ willChange: 'transform, opacity' }}
               >
                 {item.label}
               </motion.button>
@@ -113,9 +116,12 @@ function VendorNavbar() {
                 <motion.button
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/5 rounded-lg transition-colors"
+                  style={{ willChange: 'transform, opacity' }}
                 >
                   <div className="w-8 h-8 rounded-full bg-[#DC2626] flex items-center justify-center text-white font-semibold text-xs">
                     {profileInitial || <User className="w-4 h-4" />}
@@ -130,9 +136,12 @@ function VendorNavbar() {
                       onClick={() => setIsUserMenuOpen(false)}
                     />
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                       className="absolute right-0 mt-2 w-56 bg-[#1a1a1a] rounded-xl shadow-2xl border border-white/10 z-[100] overflow-hidden backdrop-blur-xl"
+                      style={{ willChange: 'transform, opacity' }}
                     >
                       <div className="px-4 py-3 border-b border-white/5">
                         <p className="text-sm text-white font-medium">{displayName || 'User'}</p>
@@ -151,7 +160,7 @@ function VendorNavbar() {
                           try {
                             await signOut();
                             setIsUserMenuOpen(false);
-                            router.push('/vendor');
+                            router.push('/');
                             // Removed router.refresh() - not needed, causes unnecessary reload
                           } catch (error) {
                             console.error('Error signing out:', error);
@@ -170,7 +179,8 @@ function VendorNavbar() {
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                  style={{ willChange: 'transform, opacity' }}
                 >
                   <Link
                     href="/login"
@@ -182,9 +192,12 @@ function VendorNavbar() {
                 <motion.button
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
+                  transition={{ duration: 0.3, delay: 0.05, ease: [0.4, 0, 0.2, 1] }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => router.push('/register')}
-                  className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-all duration-200"
+                  style={{ willChange: 'transform, opacity' }}
                 >
                   Sign Up
                 </motion.button>
@@ -222,7 +235,9 @@ function VendorNavbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
             className="md:hidden bg-black/95 backdrop-blur-sm border-t border-white/10"
+            style={{ willChange: 'height, opacity' }}
           >
             <div className="px-4 py-4 space-y-4">
               {navItems.map((item) => (
@@ -259,8 +274,7 @@ function VendorNavbar() {
                         try {
                           await signOut();
                           setIsMenuOpen(false);
-                          router.push('/vendor');
-                          router.refresh();
+                          router.push('/');
                         } catch (error) {
                           console.error('Error signing out:', error);
                         }

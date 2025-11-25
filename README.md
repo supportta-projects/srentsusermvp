@@ -1,6 +1,6 @@
-# Rentorent - Camera Equipment Rental Marketplace MVP
+# Rentorent - Vendor Product Website
 
-A mobile-first, highly responsive rental marketplace for camera equipment and accessories that connects local rental shops to end users.
+A vendor-focused subscription platform for rental businesses. Vendors can subscribe to plans and access a complete rental management dashboard to manage their products, orders, customers, and staff.
 
 ## 📚 Documentation
 
@@ -16,35 +16,36 @@ A mobile-first, highly responsive rental marketplace for camera equipment and ac
 
 ## 🎯 Project Overview
 
-Rentorent enables users to browse visually-rich product cards, filter by category, city, price, and availability, and contact shops directly via a "Contact" CTA on every product card.
+Rentorent is a vendor subscription platform that helps rental businesses manage their operations. Vendors can subscribe to monthly, 6-month, or yearly plans to access a comprehensive dashboard for managing products, orders, customers, and staff.
 
 ## 🚀 Tech Stack
 
 - **Frontend**: Next.js 16 (React) with SSR + static rendering
 - **Styling**: Tailwind CSS v4
-- **Backend**: Firebase (Firestore, Storage, Functions)
-- **Hosting**: Vercel or Firebase Hosting
-- **Analytics**: Google Analytics 4 (GA4)
+- **Backend**: Supabase (PostgreSQL) for authentication and user profiles
+- **Payments**: Razorpay integration for subscription payments
+- **Hosting**: Vercel
+- **Email**: SMTP for notifications
 
 ## 📋 Features
 
-### MVP Features
-- ✅ Responsive homepage with search + city selector
-- ✅ Product listing with cards using dummy camera/accessory data
-- ✅ Working Contact modal that writes leads to Firestore
-- ✅ Product detail page with image carousel and shop info
-- ✅ Filters for city, category, price
-- ✅ Basic analytics events for product view and contact click
+### Features
+- ✅ Vendor landing page with features, pricing, and testimonials
+- ✅ Subscription plans (Monthly, 6-Month, Yearly) with Razorpay integration
+- ✅ User authentication with Supabase
+- ✅ Profile management for vendors
+- ✅ Subscription management dashboard
 - ✅ Mobile-first responsive design
-- ✅ PWA support with manifest
-- ✅ Skeleton loaders for improved perceived performance
+- ✅ Secure payment processing
+- ✅ Email notifications
 
 ## 🛠️ Setup Instructions
 
 ### Prerequisites
 - Node.js 18+ installed
-- Firebase project created
-- Firebase CLI installed (optional, for deployment)
+- Supabase project created
+- Razorpay account (for payments)
+- SMTP email configuration
 
 ### Installation
 
@@ -62,34 +63,33 @@ Rentorent enables users to browse visually-rich product cards, filter by categor
    cp .env.example .env.local
    ```
    
-   Edit `.env.local` with your Firebase configuration:
+   Edit `.env.local` with your configuration:
    ```env
-   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
-   NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
-   NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Optional
-   NEXT_PUBLIC_SITE_URL=https://rentorent.net  # Required for SEO (canonical URLs, sitemap, Open Graph)
+   # Supabase Configuration
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+   
+   # Razorpay Configuration
+   RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxx
+   RAZORPAY_KEY_SECRET=your_test_secret_key
+   NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxx
+   RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+   
+   # Email Configuration
+   SMTP_HOST=smtp.hostinger.com
+   SMTP_PORT=465
+   SMTP_USER=contact@rentorent.net
+   SMTP_PASS=your_password
+   NOTIFICATION_EMAIL=info@abijithcb.com
+   
+   # Site URL
+   NEXT_PUBLIC_SITE_URL=https://rentorent.net
    ```
 
-3. **Set up Firestore:**
-   - Create a Firestore database in Firebase Console
-   - Deploy security rules:
-     ```bash
-     firebase deploy --only firestore:rules
-     ```
-   - Deploy indexes:
-     ```bash
-     firebase deploy --only firestore:indexes
-     ```
-
-4. **Seed the database:**
-   ```bash
-   # Run seed script (tsx is already in devDependencies)
-   pnpm run seed
-   ```
+3. **Set up Supabase:**
+   - Create a Supabase project at https://supabase.com
+   - Run the SQL schema from `supabase-schema.sql` in your Supabase SQL editor
+   - Get your Project URL and anon key from Settings → API
 
 5. **Run the development server:**
    ```bash

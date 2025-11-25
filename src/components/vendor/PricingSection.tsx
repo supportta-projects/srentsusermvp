@@ -362,7 +362,7 @@ export default function PricingSection({}: PricingSectionProps) {
                             router.push(`/register?plan=${plan.id}&redirect=checkout`);
                           } else if (user) {
                             // User is logged in, go directly to checkout
-                            router.push(`/vendor/checkout?plan=${plan.id}`);
+                            router.push(`/subscribe/profile?plan=${plan.id}`);
                           }
                         }}
                         whileHover={{ scale: 1.05, y: -2 }}

@@ -60,34 +60,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Load initial session and set up auth state listener
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
 
-    // Get initial session (optimized - only if not already available)
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (!mounted) return;
-      
-      if (error) {
-        // Check if it's a configuration error (missing env vars)
-        if (error.message?.includes('placeholder') || error.message?.includes('Invalid API key')) {
-          console.warn('⚠️  Supabase not configured. Please set environment variables in Vercel.');
-        } else {
-          console.error('Error getting session:', error);
+    // Get initial session with timeout to prevent hanging
+    const loadSession = async () => {
+      try {
+        const { data: { session }, error } = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise<{ data: { session: null }, error: { message: string } }>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Session load timeout')), 3000);
+          })
+        ]) as { data: { session: any }, error: any };
+
+        clearTimeout(timeoutId);
+        
+        if (!mounted) return;
+        
+        if (error) {
+          // Check if it's a configuration error (missing env vars)
+          if (error.message?.includes('placeholder') || error.message?.includes('Invalid API key')) {
+            console.warn('⚠️  Supabase not configured. Please set environment variables in Vercel.');
+          } else {
+            console.error('Error getting session:', error);
+          }
+          setLoading(false);
+          return;
+        }
+
+        const supabaseUser = session?.user || null;
+        setUser(mapSupabaseUserToAppUser(supabaseUser));
+        setCustomer(createCustomerFromUser(supabaseUser));
+        setLoading(false);
+      } catch (err: any) {
+        clearTimeout(timeoutId);
+        if (!mounted) return;
+        // Handle errors gracefully - don't crash the app
+        if (err.message?.includes('placeholder') || err.message?.includes('Invalid API key') || err.message?.includes('timeout')) {
+          console.warn('⚠️  Supabase not configured or connection timeout. Please check environment variables.');
         }
         setLoading(false);
-        return;
       }
+    };
 
-      const supabaseUser = session?.user || null;
-      setUser(mapSupabaseUserToAppUser(supabaseUser));
-      setCustomer(createCustomerFromUser(supabaseUser));
-      setLoading(false);
-    }).catch((err) => {
-      if (!mounted) return;
-      // Handle errors gracefully - don't crash the app
-      if (err.message?.includes('placeholder') || err.message?.includes('Invalid API key')) {
-        console.warn('⚠️  Supabase not configured. Please set environment variables in Vercel.');
-      }
-      setLoading(false);
-    });
+    loadSession();
 
     // Listen for auth state changes (this will also fire immediately with current session)
     let subscription: { unsubscribe: () => void } | null = null;
@@ -114,6 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       if (subscription) {
         subscription.unsubscribe();
       }

@@ -175,7 +175,7 @@ function CheckoutPageContent() {
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">Plan not found</h2>
             <button
-              onClick={() => router.push('/vendor#pricing')}
+              onClick={() => router.push('/#pricing')}
               className="px-6 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold rounded-lg transition-colors"
             >
               Back to Pricing

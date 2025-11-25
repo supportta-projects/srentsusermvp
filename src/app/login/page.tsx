@@ -19,11 +19,11 @@ function LoginForm() {
       const planId = searchParams?.get('plan');
       const redirect = searchParams?.get('redirect');
       if (redirect === 'checkout' && planId) {
-        router.push(`/vendor/checkout?plan=${planId}`);
+        router.push(`/subscribe/profile?plan=${planId}`);
       } else if (redirect === 'checkout') {
-        router.push('/vendor/checkout');
+        router.push('/subscribe/profile');
       } else {
-        router.push('/vendor');
+        router.push('/');
       }
     }
   }, [user, router, searchParams]);
@@ -111,14 +111,20 @@ function LoginForm() {
         const redirect = searchParams?.get('redirect');
         
         if (redirect === 'checkout' && planId) {
-          // Redirect to checkout page with plan ID
-          router.push(`/vendor/checkout?plan=${planId}`);
+          // Redirect to subscribe profile page with plan ID
+          router.push(`/subscribe/profile?plan=${planId}`);
         } else if (redirect === 'checkout') {
-          // Redirect to checkout page
-          router.push('/vendor/checkout');
+          // Redirect to subscribe profile page
+          router.push('/subscribe/profile');
+        } else if (redirect === 'payment' && planId) {
+          // Redirect to subscription page with plan ID
+          router.push(`/subscription?plan=${planId}`);
+        } else if (redirect === 'payment') {
+          // Redirect to subscription page
+          router.push('/subscription');
         } else {
-          // Default redirect to vendor page
-          router.push('/vendor');
+          // Default redirect to home page
+          router.push('/');
         }
         // Removed router.refresh() - not needed, causes unnecessary full page reload
       }

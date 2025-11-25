@@ -66,6 +66,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
+        suppressHydrationWarning
       >
         <AuthProvider>
           {/* Scroll to top on route change */}

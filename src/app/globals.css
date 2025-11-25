@@ -101,6 +101,38 @@ html, body {
   -webkit-backface-visibility: hidden;
 }
 
+/* Smooth animation utilities */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.smooth-hover {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.smooth-hover:hover {
+  transform: translateY(-2px);
+}
+
+/* Optimize animations for performance */
+@supports (will-change: transform) {
+  .animate-smooth {
+    will-change: transform, opacity;
+  }
+}
+
+/* Force GPU acceleration for animated elements */
+.force-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+}
+
 /* Prevent auto-scroll on mobile */
 @media (max-width: 768px) {
   html {

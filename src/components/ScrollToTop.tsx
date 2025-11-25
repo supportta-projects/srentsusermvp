@@ -7,8 +7,9 @@ export default function ScrollToTop() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // useEffect only runs on client, so window is always available
     // Disable scroll restoration
-    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+    if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
 
