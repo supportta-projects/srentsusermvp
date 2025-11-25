@@ -25,6 +25,10 @@ Welcome to the comprehensive documentation for the **RentOrent MVP** project. Th
 ### 🚀 Deployment
 - **[VERCEL-DEPLOYMENT.md](./VERCEL-DEPLOYMENT.md)** - Vercel deployment guide with environment variables setup
 
+### ⚡ Performance
+- **[PERFORMANCE-OPTIMIZATION.md](./PERFORMANCE-OPTIMIZATION.md)** - Complete performance optimization guide
+- **[PERFORMANCE-ISSUES-SUMMARY.md](./PERFORMANCE-ISSUES-SUMMARY.md)** - Quick summary of performance issues and fixes
+
 ## 🚀 Quick Start for New Developers
 
 If you're new to this project, follow this reading order:
