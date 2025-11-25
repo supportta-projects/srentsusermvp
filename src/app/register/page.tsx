@@ -24,9 +24,9 @@ function RegisterForm() {
       } else if (redirect === 'payment') {
         router.push('/subscription');
       } else if (redirect === 'checkout' && planId) {
-        router.push(`/subscribe/profile?plan=${planId}`);
+        router.push(`/checkout?plan=${planId}`);
       } else if (redirect === 'checkout') {
-        router.push('/subscribe/profile');
+        router.push('/checkout');
       } else {
         router.push('/');
       }
@@ -124,11 +124,11 @@ function RegisterForm() {
         const redirect = searchParams.get('redirect');
         
         if (redirect === 'checkout' && planId) {
-          // Redirect to subscribe profile page with plan ID
-          router.push(`/subscribe/profile?plan=${planId}`);
+          // Redirect to checkout page with plan ID
+          router.push(`/checkout?plan=${planId}`);
         } else if (redirect === 'checkout') {
-          // Redirect to subscribe profile page
-          router.push('/subscribe/profile');
+          // Redirect to checkout page
+          router.push('/checkout');
         } else if (redirect === 'payment' && planId) {
           // Redirect to subscription page with plan ID
           router.push(`/subscription?plan=${planId}`);

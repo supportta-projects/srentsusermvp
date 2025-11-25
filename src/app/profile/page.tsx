@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCurrentUserProfile, upsertProfile } from '@/lib/supabase-profiles';
-import { User, Building2, MapPin, CheckCircle2, AlertCircle, Loader2, ChevronDown, ChevronUp, LogOut } from 'lucide-react';
+import { getVendorPayments } from '@/lib/subscriptions';
+import type { SubscriptionPayment } from '@/types';
+import { User, Building2, MapPin, CheckCircle2, AlertCircle, Loader2, ChevronDown, ChevronUp, LogOut, Receipt } from 'lucide-react';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -31,6 +33,9 @@ export default function ProfilePage() {
   // Collapsible sections state
   const [isBusinessOpen, setIsBusinessOpen] = useState(false);
   const [isAddressOpen, setIsAddressOpen] = useState(false);
+  const [isPaymentHistoryOpen, setIsPaymentHistoryOpen] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState<SubscriptionPayment[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -62,6 +67,26 @@ export default function ProfilePage() {
 
     loadProfile();
   }, [user, router]);
+
+  // Load payment history when section is opened
+  useEffect(() => {
+    if (isPaymentHistoryOpen && user && paymentHistory.length === 0) {
+      loadPaymentHistory();
+    }
+  }, [isPaymentHistoryOpen, user]);
+
+  const loadPaymentHistory = async () => {
+    if (!user) return;
+    setLoadingPayments(true);
+    try {
+      const history = await getVendorPayments(user.uid);
+      setPaymentHistory(history);
+    } catch (error) {
+      console.error('Error loading payment history:', error);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
 
   const validateGST = (gst: string): boolean => {
     if (!gst) return true; // Optional field
@@ -158,7 +183,7 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           <Link
-            href="/vendor"
+            href="/"
             className="inline-flex items-center gap-1 text-xs sm:text-sm text-gray-400 hover:text-white mb-3 sm:mb-4 transition-colors group"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span>
@@ -522,7 +547,7 @@ export default function ProfilePage() {
                   )}
                 </button>
                 <Link
-                  href="/vendor"
+                  href="/"
                   className="flex-1 sm:flex-none px-6 sm:px-8 py-3.5 sm:py-3.5 bg-white/5 hover:bg-white/10 text-white font-medium text-base sm:text-base rounded-xl transition-all duration-300 text-center border border-white/10 hover:border-white/20"
                 >
                   Cancel
@@ -531,12 +556,105 @@ export default function ProfilePage() {
             </div>
           </form>
 
+          {/* Payment History Section - Collapsible */}
+          <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/5">
+            <button
+              type="button"
+              onClick={() => setIsPaymentHistoryOpen(!isPaymentHistoryOpen)}
+              className="w-full flex items-center justify-between gap-2 mb-3 sm:mb-4 p-3 -m-3 rounded-xl hover:bg-white/5 active:bg-white/10 transition-all duration-200"
+            >
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-[#DC2626]/10">
+                  <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626]" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white">Payment History</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">View your subscription payments</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {paymentHistory.length > 0 && !isPaymentHistoryOpen && (
+                  <span className="text-xs text-[#DC2626] font-medium hidden sm:inline">
+                    {paymentHistory.length} {paymentHistory.length === 1 ? 'payment' : 'payments'}
+                  </span>
+                )}
+                {isPaymentHistoryOpen ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                )}
+              </div>
+            </button>
+
+            {isPaymentHistoryOpen && (
+              <div className="space-y-3 animate-in slide-in-from-top-2 duration-200">
+                {loadingPayments ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#DC2626]" />
+                  </div>
+                ) : paymentHistory.length === 0 ? (
+                  <div className="text-center py-8 px-4 bg-white/5 rounded-xl border border-white/10">
+                    <Receipt className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+                    <p className="text-gray-400 text-sm">No payment history found</p>
+                    <p className="text-gray-500 text-xs mt-1">Your subscription payments will appear here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {paymentHistory.map((payment) => (
+                      <div
+                        key={payment.id}
+                        className="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-white mb-1">{payment.planName}</p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(payment.createdAt).toLocaleDateString('en-IN', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              })}
+                            </p>
+                            {payment.razorpayPaymentId && (
+                              <p className="text-xs text-gray-500 mt-1 font-mono">
+                                Payment ID: {payment.razorpayPaymentId.slice(-8)}
+                              </p>
+                            )}
+                          </div>
+                          <span
+                            className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                              payment.status === 'completed'
+                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                : payment.status === 'pending'
+                                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                : payment.status === 'failed'
+                                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                            }`}
+                          >
+                            {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between pt-2 border-t border-white/5">
+                          <span className="text-xs text-gray-400">Amount</span>
+                          <p className="text-lg font-bold text-white">
+                            ₹{payment.amount.toLocaleString('en-IN')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Logout Section */}
           <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/5">
             <button
               onClick={async () => {
                 await signOut();
-                router.push('/vendor');
+                router.push('/');
               }}
               className="w-full flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-3.5 bg-white/5 hover:bg-red-500/10 text-red-400 hover:text-red-300 font-medium text-base sm:text-base rounded-xl transition-all duration-300 border border-white/10 hover:border-red-500/30 active:scale-[0.98]"
             >

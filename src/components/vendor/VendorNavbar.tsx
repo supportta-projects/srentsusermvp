@@ -129,6 +129,7 @@ function VendorNavbar() {
                   <span className="hidden lg:inline">{displayName || 'User'}</span>
                 </motion.button>
                 
+                <AnimatePresence>
                 {isUserMenuOpen && (
                   <>
                     <div 
@@ -136,12 +137,12 @@ function VendorNavbar() {
                       onClick={() => setIsUserMenuOpen(false)}
                     />
                     <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                       className="absolute right-0 mt-2 w-56 bg-[#1a1a1a] rounded-xl shadow-2xl border border-white/10 z-[100] overflow-hidden backdrop-blur-xl"
-                      style={{ willChange: 'transform, opacity' }}
+                        style={{ willChange: 'transform, opacity' }}
                     >
                       <div className="px-4 py-3 border-b border-white/5">
                         <p className="text-sm text-white font-medium">{displayName || 'User'}</p>
@@ -160,8 +161,7 @@ function VendorNavbar() {
                           try {
                             await signOut();
                             setIsUserMenuOpen(false);
-                            router.push('/');
-                            // Removed router.refresh() - not needed, causes unnecessary reload
+                              router.push('/');
                           } catch (error) {
                             console.error('Error signing out:', error);
                           }
@@ -173,6 +173,7 @@ function VendorNavbar() {
                     </motion.div>
                   </>
                 )}
+                </AnimatePresence>
               </div>
             ) : (
               <>
@@ -208,17 +209,22 @@ function VendorNavbar() {
           {/* Mobile Menu Button / Profile Icon */}
           <div className="md:hidden">
             {authLoading ? (
-              <div className="w-8 h-8 border-2 border-gray-600 border-t-[#DC2626] rounded-full animate-spin"></div>
+              <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin flex items-center justify-center"></div>
             ) : user ? (
-              <Link
-                href="/profile"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-[#DC2626] text-white font-semibold text-sm hover:bg-[#B91C1C] transition-colors"
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-white/30 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-200"
+                style={{ willChange: 'transform, opacity' }}
               >
-                {profileInitial || <User className="w-5 h-5" />}
-              </Link>
+                {profileInitial ? (
+                  <span className="text-white font-semibold text-sm">{profileInitial}</span>
+                ) : (
+                  <User className="w-5 h-5 text-white" />
+                )}
+              </button>
             ) : (
               <button
-                className="text-white p-2"
+                className="text-white p-2 hover:bg-white/5 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -255,17 +261,17 @@ function VendorNavbar() {
               ))}
               <div className="pt-4 border-t border-white/10 space-y-2">
                 {authLoading ? (
-                  <div className="w-8 h-8 border-2 border-gray-600 border-t-[#DC2626] rounded-full animate-spin mx-auto"></div>
+                  <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
                 ) : user ? (
                   <>
-                    <div className="px-4 py-2">
+                    <div className="px-4 py-3 bg-white/5 rounded-lg mb-2 border border-white/10">
                       <p className="text-sm text-white font-medium">{displayName || 'User'}</p>
                       <p className="text-xs text-gray-400 truncate">{user.email}</p>
                     </div>
                     <Link
                       href="/profile"
                       onClick={() => setIsMenuOpen(false)}
-                      className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg"
+                      className="block w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg"
                     >
                       Profile
                     </Link>
@@ -279,7 +285,7 @@ function VendorNavbar() {
                           console.error('Error signing out:', error);
                         }
                       }}
-                      className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg text-left"
+                      className="block w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg text-left"
                     >
                       Logout
                     </button>
@@ -289,7 +295,7 @@ function VendorNavbar() {
                     <Link
                       href="/login"
                       onClick={() => setIsMenuOpen(false)}
-                      className="block w-full px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors rounded-lg"
+                      className="block w-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-colors rounded-lg"
                     >
                       Sign In
                     </Link>
@@ -298,13 +304,55 @@ function VendorNavbar() {
                         router.push('/register');
                         setIsMenuOpen(false);
                       }}
-                      className="block w-full px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
+                      className="block w-full px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium rounded-lg transition-colors"
                     >
                       Sign Up
                     </button>
                   </>
                 )}
               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile User Menu Dropdown (when profile icon clicked) */}
+      <AnimatePresence>
+        {isUserMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            className="md:hidden fixed top-16 left-0 right-0 bg-[#1a1a1a] border-b border-white/10 z-[100] backdrop-blur-xl"
+            style={{ willChange: 'transform, opacity' }}
+          >
+            <div className="px-4 py-4 space-y-2">
+              <div className="px-4 py-3 bg-white/5 rounded-lg mb-2 border border-white/10">
+                <p className="text-sm text-white font-medium">{displayName || 'User'}</p>
+                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+              </div>
+              <Link
+                href="/profile"
+                onClick={() => setIsUserMenuOpen(false)}
+                className="block w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg"
+              >
+                Profile
+              </Link>
+              <button
+                onClick={async () => {
+                  try {
+                    await signOut();
+                    setIsUserMenuOpen(false);
+                    router.push('/');
+                  } catch (error) {
+                    console.error('Error signing out:', error);
+                  }
+                }}
+                className="block w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors rounded-lg text-left"
+              >
+                Logout
+              </button>
             </div>
           </motion.div>
         )}

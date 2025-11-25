@@ -358,11 +358,11 @@ export default function PricingSection({}: PricingSectionProps) {
                         onClick={() => {
                           // Check if user is logged in
                           if (!user && !authLoading) {
-                            // Redirect to register with plan ID
+                            // Not logged in - redirect to register/login with plan ID
                             router.push(`/register?plan=${plan.id}&redirect=checkout`);
                           } else if (user) {
-                            // User is logged in, go directly to checkout
-                            router.push(`/subscribe/profile?plan=${plan.id}`);
+                            // User is logged in - go directly to checkout
+                            router.push(`/checkout?plan=${plan.id}`);
                           }
                         }}
                         whileHover={{ scale: 1.05, y: -2 }}
