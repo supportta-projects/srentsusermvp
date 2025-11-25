@@ -111,14 +111,14 @@ export default function ProfilePage() {
       // The actual save happens in the background
       const { error: updateError } = await upsertProfile({
         full_name: fullName.trim(),
-        phone: phone.trim() || null,
-        company_name: companyName.trim() || null,
-        gst_number: gstNumber.trim().toUpperCase() || null,
-        address_line1: addressLine1.trim() || null,
-        address_line2: addressLine2.trim() || null,
-        city: city.trim() || null,
-        state: state.trim() || null,
-        postal_code: postalCode.trim() || null,
+        phone: phone.trim() || undefined,
+        company_name: companyName.trim() || undefined,
+        gst_number: gstNumber.trim().toUpperCase() || undefined,
+        address_line1: addressLine1.trim() || undefined,
+        address_line2: addressLine2.trim() || undefined,
+        city: city.trim() || undefined,
+        state: state.trim() || undefined,
+        postal_code: postalCode.trim() || undefined,
         country: country.trim() || 'India',
       });
 

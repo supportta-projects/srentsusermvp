@@ -30,7 +30,7 @@ function mapSupabaseUserToAppUser(supabaseUser: SupabaseUser | null): AppUser | 
   
   return {
     uid: supabaseUser.id,
-    email: supabaseUser.email,
+    email: supabaseUser.email ?? null,
     displayName: supabaseUser.user_metadata?.name || supabaseUser.user_metadata?.display_name || null,
   };
 }
