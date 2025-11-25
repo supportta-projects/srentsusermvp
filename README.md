@@ -2,6 +2,18 @@
 
 A mobile-first, highly responsive rental marketplace for camera equipment and accessories that connects local rental shops to end users.
 
+## 📚 Documentation
+
+**Comprehensive documentation is available in the [`docs/`](./docs/) folder.**
+
+- **[Documentation Index](./docs/README.md)** - Start here for complete documentation
+- **[Project Journey](./docs/01-PROJECT-JOURNEY.md)** - Complete development journey with lessons learned
+- **[Database Schema](./docs/02-DATABASE-SCHEMA.md)** - Detailed database documentation
+- **[Data Flow](./docs/03-DATA-FLOW.md)** - How data flows through the system
+- **[Step-by-Step Guide](./docs/04-STEP-BY-STEP-GUIDE.md)** - Implementation guide for beginners
+- **[Architecture](./docs/05-ARCHITECTURE.md)** - System architecture overview
+- **[API Endpoints](./docs/06-API-ENDPOINTS.md)** - API reference documentation
+
 ## 🎯 Project Overview
 
 Rentorent enables users to browse visually-rich product cards, filter by category, city, price, and availability, and contact shops directly via a "Contact" CTA on every product card.
