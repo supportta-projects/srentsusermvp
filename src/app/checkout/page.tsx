@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Loader2, CheckCircle2, Tag, X, Check } from 'lucide-react';
 import VendorNavbar from '@/components/vendor/VendorNavbar';
 import { SubscriptionPlan } from '@/types';
 import { getSubscriptionPlans } from '@/lib/subscriptions';
@@ -22,6 +22,17 @@ function CheckoutPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+  
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    description: string;
+    discount: number;
+    discountType: string;
+  } | null>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   // Redirect to login if not logged in
   useEffect(() => {
@@ -142,151 +153,42 @@ function CheckoutPageContent() {
     setError(null);
 
     try {
-      const GST_RATE = 0.18;
-      const baseAmount = plan.amount;
-      const gstAmount = Math.round(baseAmount * GST_RATE);
-      const totalAmount = baseAmount + gstAmount;
-
-      // Create Razorpay order
-      const response = await fetch('/api/razorpay/create-order', {
+      // Create PhonePe payment using new API
+      const response = await fetch('/api/payments/phonepe/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId: user.uid,
           planId: plan.id,
-          vendorId: user.uid,
-          vendorEmail: user.email || undefined,
-          vendorName: user.displayName || profile?.full_name || undefined,
+          amount: totalAmount, // Amount in rupees (will be converted to paise in backend)
+          description: `Subscription: ${plan.name}`,
+          metadata: {
+            planId: plan.id,
+            planName: plan.name,
+            couponCode: appliedCoupon?.code || null,
+            discount: appliedCoupon?.discount || 0,
+          },
           vendorPhone: profile?.phone || undefined,
-          amount: totalAmount,
         }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create order');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        const errorMessage = errorData.error || errorData.message || 'Failed to create payment';
+        console.error('Payment creation error:', errorData);
+        throw new Error(errorMessage);
       }
 
-      const orderData = await response.json();
-      const isTestMode = orderData.testMode || orderData.key?.includes('dummy') || orderData.key?.includes('test');
+      const paymentData = await response.json();
 
-      // In test mode with dummy credentials, simulate payment
-      if (isTestMode && orderData.key?.includes('dummy')) {
-        console.log('🧪 TEST MODE: Simulating payment...');
-        
-        setTimeout(async () => {
-          try {
-            const mockResponse = {
-              razorpay_order_id: orderData.orderId,
-              razorpay_payment_id: `pay_test_${Date.now()}`,
-              razorpay_signature: 'test_signature_dummy',
-            };
-
-            const verifyResponse = await fetch('/api/razorpay/verify-payment', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                orderId: mockResponse.razorpay_order_id,
-                paymentId: mockResponse.razorpay_payment_id,
-                signature: mockResponse.razorpay_signature,
-                vendorId: user.uid,
-                planId: plan.id,
-                vendorEmail: user.email || undefined,
-                vendorName: user.displayName || profile?.full_name || undefined,
-                vendorPhone: profile?.phone || undefined,
-              }),
-            });
-
-            if (!verifyResponse.ok) {
-              throw new Error('Payment verification failed');
-            }
-
-            setPaymentStatus('success');
-            
-            setTimeout(() => {
-              router.push(`/subscribe/success?plan=${plan.id}`);
-            }, 2000);
-          } catch (error: any) {
-            console.error('Payment verification error:', error);
-            setPaymentStatus('error');
-            setError(error.message || 'Payment verification failed');
-            setIsSubmitting(false);
-          }
-        }, 2000);
-
-        alert('🧪 TEST MODE: Payment will be simulated. No real payment will be processed.');
-        return;
+      // Redirect to PhonePe payment page
+      if (paymentData.redirectUrl) {
+        window.location.href = paymentData.redirectUrl;
+      } else {
+        throw new Error('Payment URL not received');
       }
-
-      // Real Razorpay integration
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => {
-        const options: any = {
-          key: orderData.key,
-          amount: orderData.amount,
-          currency: orderData.currency,
-          name: 'Rentorent',
-          description: `Subscription: ${plan.name}`,
-          order_id: orderData.orderId,
-          handler: async function (response: any) {
-            try {
-              const verifyResponse = await fetch('/api/razorpay/verify-payment', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  orderId: response.razorpay_order_id,
-                  paymentId: response.razorpay_payment_id,
-                  signature: response.razorpay_signature,
-                  vendorId: user.uid,
-                  planId: plan.id,
-                  vendorEmail: user.email || undefined,
-                  vendorName: user.displayName || profile?.full_name || undefined,
-                  vendorPhone: profile?.phone || undefined,
-                }),
-              });
-
-              if (!verifyResponse.ok) {
-                throw new Error('Payment verification failed');
-              }
-
-              setPaymentStatus('success');
-              
-              setTimeout(() => {
-                router.push(`/subscribe/success?plan=${plan.id}`);
-              }, 2000);
-            } catch (error: any) {
-              console.error('Payment verification error:', error);
-              setPaymentStatus('error');
-              setError(error.message || 'Payment verification failed');
-              setIsSubmitting(false);
-            }
-          },
-          prefill: {
-            email: user.email || profile?.full_name || '',
-            name: user.displayName || profile?.full_name || '',
-            contact: profile?.phone || '',
-          },
-          theme: {
-            color: '#DC2626',
-          },
-          modal: {
-            ondismiss: function() {
-              setIsSubmitting(false);
-              setPaymentStatus('idle');
-            },
-          },
-        };
-
-        const razorpay = (window as any).Razorpay(options);
-        razorpay.open();
-      };
-      document.body.appendChild(script);
     } catch (error: any) {
       console.error('Payment error:', error);
       setPaymentStatus('error');
@@ -295,19 +197,58 @@ function CheckoutPageContent() {
     }
   };
 
-  // Load Razorpay script
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.async = true;
-    document.body.appendChild(script);
+  // Validate coupon
+  const handleValidateCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
 
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
+    setValidatingCoupon(true);
+    setCouponError(null);
+
+    try {
+      const response = await fetch('/api/coupon/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          couponCode: couponCode.trim(),
+          planAmount: plan?.amount || 0,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setCouponError(data.error || 'Invalid coupon code');
+        setAppliedCoupon(null);
+        return;
       }
-    };
-  }, []);
+
+      if (data.valid) {
+        setAppliedCoupon({
+          code: data.coupon.code,
+          description: data.coupon.description,
+          discount: data.amounts.discount,
+          discountType: data.coupon.discountType,
+        });
+        setCouponError(null);
+      }
+    } catch (error: any) {
+      console.error('Error validating coupon:', error);
+      setCouponError('Failed to validate coupon. Please try again.');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponCode('');
+    setAppliedCoupon(null);
+    setCouponError(null);
+  };
 
   if (authLoading || loading) {
     return (
@@ -343,10 +284,13 @@ function CheckoutPageContent() {
     );
   }
 
+  // Calculate amounts with coupon
   const GST_RATE = 0.18;
   const baseAmount = plan.amount;
-  const gstAmount = Math.round(baseAmount * GST_RATE);
-  const totalAmount = baseAmount + gstAmount;
+  const discountAmount = appliedCoupon?.discount || 0;
+  const subtotalAfterDiscount = Math.max(0, baseAmount - discountAmount);
+  const gstAmount = Math.round(subtotalAfterDiscount * GST_RATE);
+  const totalAmount = subtotalAfterDiscount + gstAmount;
   const dailyPrice = Math.round(plan.amount / plan.duration);
 
   return (
@@ -441,6 +385,73 @@ function CheckoutPageContent() {
                 </div>
               </motion.div>
 
+              {/* Coupon Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 sm:p-8"
+              >
+                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <Tag className="w-5 h-5 text-[#DC2626]" />
+                  Discount Coupon
+                </h2>
+                
+                {!appliedCoupon ? (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleValidateCoupon();
+                          }
+                        }}
+                        placeholder="Enter coupon code"
+                        className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626]/50 focus:border-[#DC2626]/30 text-white placeholder-gray-500 transition-all"
+                      />
+                      <button
+                        onClick={handleValidateCoupon}
+                        disabled={validatingCoupon || !couponCode.trim()}
+                        className="px-6 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {validatingCoupon ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          'Apply'
+                        )}
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-sm text-red-400">{couponError}</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-400" />
+                      <div>
+                        <p className="text-sm font-medium text-white">
+                          Coupon Applied: {appliedCoupon.code}
+                        </p>
+                        <p className="text-xs text-gray-400">{appliedCoupon.description}</p>
+                        <p className="text-sm text-green-400 mt-1">
+                          You saved ₹{appliedCoupon.discount.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleRemoveCoupon}
+                      className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+
               {/* Order Summary */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -467,6 +478,16 @@ function CheckoutPageContent() {
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-400">Subtotal:</span>
                       <span className="text-gray-300">₹{baseAmount.toLocaleString()}</span>
+                    </div>
+                    {appliedCoupon && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-400">Discount ({appliedCoupon.code}):</span>
+                        <span className="text-green-400">-₹{discountAmount.toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">Subtotal after discount:</span>
+                      <span className="text-gray-300">₹{subtotalAfterDiscount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-400">GST (18%):</span>
@@ -532,7 +553,7 @@ function CheckoutPageContent() {
                   </motion.button>
 
                   <p className="text-xs text-gray-500 text-center mt-4">
-                    🔒 Secure payment powered by Razorpay
+                    🔒 Secure payment powered by PhonePe
                   </p>
                 </>
               )}
