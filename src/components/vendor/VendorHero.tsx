@@ -101,7 +101,7 @@ export default function VendorHero({ onGetStarted }: VendorHeroProps) {
                           filter: 'drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2))',
                         }}
                       >
-                        ₹27
+                        ₹41
                       </motion.span>
                       <motion.span
                         initial={{ opacity: 0 }}

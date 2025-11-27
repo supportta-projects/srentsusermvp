@@ -12,7 +12,7 @@ const subscriptionPlans: Omit<SubscriptionPlan, 'id'>[] = [
   {
     name: 'Basic',
     description: 'A basic plan for startups and individual users',
-    amount: 1499, // ₹1499/month
+    amount: 1799, // ₹1799/month
     duration: 30, // 30 days
     features: [
       'Full access to vendor dashboard',
@@ -30,7 +30,7 @@ const subscriptionPlans: Omit<SubscriptionPlan, 'id'>[] = [
   {
     name: 'Premium',
     description: 'A premium plan for growing businesses',
-    amount: 6300, // ₹6300 for 6 months (₹35/day)
+    amount: 9000, // ₹9000 for 6 months (₹50/day)
     duration: 180, // 180 days (6 months)
     features: [
       'Full access to vendor dashboard',
@@ -40,7 +40,7 @@ const subscriptionPlans: Omit<SubscriptionPlan, 'id'>[] = [
       'Staff management',
       'Analytics and reports',
       'Priority email support',
-      'Save ₹2694 compared to monthly',
+      'Save ₹1,794 compared to monthly',
     ],
     isActive: true,
     createdAt: new Date(),
@@ -49,7 +49,7 @@ const subscriptionPlans: Omit<SubscriptionPlan, 'id'>[] = [
   {
     name: 'Enterprise',
     description: 'An enterprise plan with advanced features for large organizations',
-    amount: 9999, // ₹9999/year (₹27/day, highlighted as ₹35/day)
+    amount: 14999, // ₹14999/year (₹41/day)
     duration: 365, // 365 days
     features: [
       'Full access to vendor dashboard',
@@ -60,8 +60,8 @@ const subscriptionPlans: Omit<SubscriptionPlan, 'id'>[] = [
       'Analytics and reports',
       'Priority email support',
       'Phone support',
-      'Save ₹4497 compared to monthly',
-      'Best value - Only ₹35/day',
+      'Save ₹6,589 compared to monthly',
+      'Best value - Only ₹41/day',
     ],
     isActive: true,
     createdAt: new Date(),
@@ -95,9 +95,9 @@ async function seedSubscriptionPlans() {
 
     console.log('\n✅ Subscription plans seeded successfully!');
     console.log('\nPlans created:');
-    console.log('  - Basic Plan (₹1499/month)');
-    console.log('  - Premium Plan (₹6300/6 months = ₹35/day)');
-    console.log('  - Enterprise Plan (₹9999/year = ₹27/day, highlighted as ₹35/day)');
+    console.log('  - Basic Plan (₹1799/month)');
+    console.log('  - Premium Plan (₹9000/6 months = ₹50/day)');
+    console.log('  - Enterprise Plan (₹14999/year = ₹41/day)');
   } catch (error) {
     console.error('❌ Error seeding subscription plans:', error);
     process.exit(1);

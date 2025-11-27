@@ -37,7 +37,7 @@ export default function PricingSection({}: PricingSectionProps) {
       id: 'monthly',
       name: 'Basic',
       description: 'A basic plan for startups and individual users',
-      amount: 1499,
+      amount: 1799,
       duration: 30,
       features: [
         'Full access to vendor dashboard',
@@ -56,7 +56,7 @@ export default function PricingSection({}: PricingSectionProps) {
       id: 'six-month',
       name: 'Premium',
       description: 'A premium plan for growing businesses',
-      amount: 6300, // ₹35/day * 180 days
+      amount: 9000, // ₹50/day * 180 days
       duration: 180,
       features: [
         'Full access to vendor dashboard',
@@ -66,7 +66,7 @@ export default function PricingSection({}: PricingSectionProps) {
         'Staff management',
         'Analytics and reports',
         'Priority email support',
-        'Save ₹2694 compared to monthly',
+        'Save ₹1,794 compared to monthly',
       ],
       isActive: true,
       createdAt: new Date(),
@@ -76,7 +76,7 @@ export default function PricingSection({}: PricingSectionProps) {
       id: 'yearly',
       name: 'Enterprise',
       description: 'An enterprise plan with advanced features for large organizations',
-      amount: 9999,
+      amount: 14999,
       duration: 365,
       features: [
         'Full access to vendor dashboard',
@@ -87,8 +87,8 @@ export default function PricingSection({}: PricingSectionProps) {
         'Analytics and reports',
         'Priority email support',
         'Phone support',
-        'Save ₹4497 compared to monthly',
-        'Best value - Only ₹35/day',
+        'Save ₹6,589 compared to monthly',
+        'Best value - Only ₹41/day',
       ],
       isActive: true,
       createdAt: new Date(),
@@ -181,7 +181,7 @@ export default function PricingSection({}: PricingSectionProps) {
                       filter: 'drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2))',
                     }}
                   >
-                    ₹27
+                    ₹41
                   </motion.span>
                   <motion.span
                     initial={{ opacity: 0 }}
@@ -327,7 +327,7 @@ export default function PricingSection({}: PricingSectionProps) {
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
                             <span className="text-gray-400 text-sm">Only</span>
-                            <span className={`text-lg font-bold ${dailyPrice <= 27 ? 'text-[#DC2626]' : dailyPrice <= 35 ? 'text-[#F59E0B]' : 'text-gray-300'}`}>
+                            <span className={`text-lg font-bold ${dailyPrice <= 41 ? 'text-[#DC2626]' : dailyPrice <= 50 ? 'text-[#F59E0B]' : 'text-gray-300'}`}>
                               ₹{dailyPrice}/day
                             </span>
                             {isBestValue && (
@@ -338,17 +338,17 @@ export default function PricingSection({}: PricingSectionProps) {
                           </div>
                           {plan.duration === 30 && (
                             <div className="text-xs text-gray-500">
-                              Save ₹2,694 with 6-month plan
+                              Save ₹1,794 with 6-month plan
                             </div>
                           )}
                           {plan.duration === 180 && (
                             <div className="text-xs text-gray-500">
-                              Save ₹3,699 with yearly plan
+                              Save ₹5,995 with yearly plan
                             </div>
                           )}
                           {plan.duration === 365 && (
                             <div className="text-xs text-[#10B981] font-medium">
-                              Save ₹7,989 vs monthly • Best value
+                              Save ₹6,589 vs monthly • Best value
                             </div>
                           )}
                         </div>

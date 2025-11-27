@@ -31,6 +31,10 @@ const PricingFAQ = dynamic(() => import('@/components/vendor/PricingFAQ'), {
   loading: () => <div className="h-96 bg-black" />,
 });
 
+const TrainingSection = dynamic(() => import('@/components/vendor/TrainingSection'), {
+  loading: () => <div className="h-96 bg-black" />,
+});
+
 const SecuritySection = dynamic(() => import('@/components/vendor/SecuritySection'), {
   loading: () => <div className="h-96 bg-black" />,
 });
@@ -82,6 +86,7 @@ export default function HomePage() {
       <TrustedBySection />
       <PricingSection />
       <PricingFAQ />
+      <TrainingSection />
       <SecuritySection />
       <SupportSection />
       <FAQSection />
